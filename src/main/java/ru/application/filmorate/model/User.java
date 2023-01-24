@@ -2,7 +2,6 @@ package ru.application.filmorate.model;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -18,7 +17,6 @@ public class User {
     private final String email;
     @NotBlank(message = "Логин не может быть пустым или содержать пробелы.")
     private final String login;
-    @Setter
     private String name;
     @Past(message = "Дата рождения не может быть в будущем.")
     private final LocalDate birthday;
