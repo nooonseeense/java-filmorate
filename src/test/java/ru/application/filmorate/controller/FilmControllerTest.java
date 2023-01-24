@@ -53,41 +53,6 @@ public class FilmControllerTest extends FilmController {
     }
 
     @Test
-    public void shouldReturnAnExceptionIfStringName() {
-        Film film = new Film(
-                "",
-                "A pregnant hitman named Black Mamba is shot during her marriage by a man named Bill.",
-                LocalDate.of(2003, 12, 20),
-                113);
-        final FilmValidationException ex = assertThrows(FilmValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Название не может быть пустым.", ex.getMessage());
-    }
-
-    @Test
-    public void shouldReturnAnExceptionIfNullName() {
-        Film film = new Film(
-                null,
-                "A pregnant hitman named Black Mamba is shot during her marriage by a man named Bill.",
-                LocalDate.of(2003, 12, 20),
-                113);
-        final FilmValidationException ex = assertThrows(FilmValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Название не может быть пустым.", ex.getMessage());
-    }
-
-    @Test
-    public void shouldReturnAnExceptionIfMore200Char() {
-        Film film = new Film(
-                "Kill Bill",
-                "A pregnant hitman named Black Mamba is shot during her marriage by a man named Bill.\n" +
-                        "A pregnant hitman named Black Mamba is shot during her marriage by a man named Bill.\n" +
-                        "A pregnant hitman named Black M",
-                LocalDate.of(2003, 12, 20),
-                113);
-        final FilmValidationException ex = assertThrows(FilmValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Максимальная длина описания — 200 символов.", ex.getMessage());
-    }
-
-    @Test
     public void mustReturnAnExceptionIfTheReleaseDateIsBefore28December1895Year() {
         Film film = new Film(
                 "Kill Bill",
@@ -96,17 +61,6 @@ public class FilmControllerTest extends FilmController {
                 113);
         final FilmValidationException ex = assertThrows(FilmValidationException.class, () -> filmController.addFilm(film));
         assertEquals("Дата релиза не может быть раньше " + LocalDate.of(1895, 12, 28), ex.getMessage());
-    }
-
-    @Test
-    public void shouldReturnAnExceptionIfTheMovieDurationIsNegative() {
-        Film film = new Film(
-                "Kill Bill",
-                "A pregnant hitman named Black Mamba is shot during her marriage by a man named Bill.",
-                LocalDate.of(1895, Month.DECEMBER, 29),
-                0);
-        final FilmValidationException ex = assertThrows(FilmValidationException.class, () -> filmController.addFilm(film));
-        assertEquals("Продолжительность фильма должна быть положительной.", ex.getMessage());
     }
 
     @Test

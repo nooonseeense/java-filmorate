@@ -6,7 +6,6 @@ import ru.application.filmorate.model.User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,23 +52,7 @@ public class UserController {
     }
 
     private User validationUser(User user) {
-        String exceptionMessage;
-        if (user.getEmail() == null || user.getEmail().equals(" ") || !user.getEmail().contains("@")) {
-            exceptionMessage = "Электронная почта не может быть пустой и должна содержать символ @.";
-            log.warn("Ошибка при валидации пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        if (user.getLogin() == null || user.getLogin().equals(" ") || user.getLogin().matches(" ")) {
-            exceptionMessage = "Логин не может быть пустым и содержать пробелы.";
-            log.warn("Ошибка при валидации пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            exceptionMessage = "Дата рождения не может быть в будущем.";
-            log.warn("Ошибка при валидации пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        if (user.getName() == null || user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         return user;

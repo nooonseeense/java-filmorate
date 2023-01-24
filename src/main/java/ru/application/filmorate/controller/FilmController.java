@@ -16,9 +16,8 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class FilmController {
-    private final static int MAX_DESCRIPTION_LENGTH = 200;
+    public final static int MAX_DESCRIPTION_LENGTH = 200;
     private final static LocalDate THE_OLDEST_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
-    private final static int MIN_FILM_DURATION = 0;
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 1;
 
@@ -58,23 +57,8 @@ public class FilmController {
 
     private Film validateFilm(Film film) {
         String exceptionMessage;
-        if (film.getName() == null || film.getName().equals("")) {
-            exceptionMessage = "Название не может быть пустым.";
-            log.warn("Ошибка при валидации фильма. Текст исключения: {}", exceptionMessage);
-            throw new FilmValidationException(exceptionMessage);
-        }
-        if (film.getDescription().length() >= MAX_DESCRIPTION_LENGTH) {
-            exceptionMessage = "Максимальная длина описания — " + MAX_DESCRIPTION_LENGTH + " символов.";
-            log.warn("Ошибка при валидации фильма. Текст исключения: {}", exceptionMessage);
-            throw new FilmValidationException(exceptionMessage);
-        }
         if (film.getReleaseDate().isBefore(THE_OLDEST_RELEASE_DATE)) {
             exceptionMessage = "Дата релиза не может быть раньше " + THE_OLDEST_RELEASE_DATE;
-            log.warn("Ошибка при валидации фильма. Текст исключения: {}", exceptionMessage);
-            throw new FilmValidationException(exceptionMessage);
-        }
-        if (film.getDuration() <= MIN_FILM_DURATION) {
-            exceptionMessage = "Продолжительность фильма должна быть положительной.";
             log.warn("Ошибка при валидации фильма. Текст исключения: {}", exceptionMessage);
             throw new FilmValidationException(exceptionMessage);
         }
