@@ -21,6 +21,7 @@ public class UserControllerTest extends UserController {
                 .build();
 
         assertEquals(user, userController.createUser(user), "Пользователь не был создан.");
+        System.out.println(user.toString());
     }
 
     @Test

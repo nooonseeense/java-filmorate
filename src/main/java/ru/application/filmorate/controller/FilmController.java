@@ -16,7 +16,6 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class FilmController {
-    public final static int MAX_DESCRIPTION_LENGTH = 200;
     private final static LocalDate THE_OLDEST_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 1;

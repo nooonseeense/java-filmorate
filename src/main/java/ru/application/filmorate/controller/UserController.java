@@ -52,6 +52,11 @@ public class UserController {
     }
 
     private User validationUser(User user) {
+        if (user.getLogin().matches(".*\\s+.*")) {
+            String exceptionMessage = "Логин не может содержать пробелы.";
+            log.warn("Ошибка при валидации пользователя. Текст исключения: {}", exceptionMessage);
+            throw new UserValidationException(exceptionMessage);
+        }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
