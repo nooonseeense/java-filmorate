@@ -1,9 +1,11 @@
 package ru.application.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.exception.FilmValidationException;
 import ru.application.filmorate.model.Film;
+import ru.application.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -13,10 +15,16 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class FilmService {
+public class FilmService implements FilmStorage {
+    private final FilmStorage filmStorage;
     private final static LocalDate THE_OLDEST_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 1;
+
+    @Autowired
+    public FilmService(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     public Film addFilm(Film filmFromRequest) {
         log.info("Получен запрос 'POST /films'");
@@ -64,5 +72,20 @@ public class FilmService {
             throw new FilmValidationException(exceptionMessage);
         }
         return film;
+    }
+
+    @Override
+    public void addALikeToAMovie() {
+
+    }
+
+    @Override
+    public void removeALikeFromAMovie() {
+
+    }
+
+    @Override
+    public List<Film> outputMovieByLikes() {
+        return null;
     }
 }

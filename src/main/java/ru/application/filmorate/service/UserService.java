@@ -1,10 +1,12 @@
 package ru.application.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.application.filmorate.exception.UserValidationException;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -13,9 +15,15 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class UserService {
+public class UserService implements UserStorage {
+    private final UserStorage userStorage;
     private final Map<Integer, User> users = new HashMap<>();
     private int userId = 1;
+
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public User createUser(User userFromRequest) {
         log.info("Получен запрос 'POST /users'");
@@ -65,5 +73,20 @@ public class UserService {
             user.setName(user.getLogin());
         }
         return user;
+    }
+
+    @Override
+    public void addAsFriend() {
+
+    }
+
+    @Override
+    public void removeFromFriends() {
+
+    }
+
+    @Override
+    public List<User> listOfCommonFriends() {
+        return null;
     }
 }
