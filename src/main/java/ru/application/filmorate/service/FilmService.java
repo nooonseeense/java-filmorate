@@ -21,7 +21,6 @@ public class FilmService implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 1;
 
-    @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }

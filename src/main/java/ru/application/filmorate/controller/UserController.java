@@ -1,5 +1,6 @@
 package ru.application.filmorate.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.application.filmorate.model.User;
 import org.springframework.web.bind.annotation.*;
 import ru.application.filmorate.service.UserService;
@@ -12,6 +13,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }

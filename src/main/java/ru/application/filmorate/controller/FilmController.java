@@ -1,5 +1,6 @@
 package ru.application.filmorate.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.application.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
 import ru.application.filmorate.service.FilmService;
@@ -12,6 +13,7 @@ import java.util.List;
 public class FilmController {
     private final FilmService filmService;
 
+    @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
