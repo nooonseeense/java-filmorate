@@ -20,6 +20,7 @@ public class UserService implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private int userId = 1;
 
+    @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
