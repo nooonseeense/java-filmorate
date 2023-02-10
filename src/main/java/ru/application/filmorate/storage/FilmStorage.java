@@ -5,10 +5,9 @@ import ru.application.filmorate.model.Film;
 import java.util.List;
 
 public interface FilmStorage {
+    List<Film> getFilms();
 
-    void addALikeToAMovie();
+    Film updateFilm(Film filmFromRequest);
 
-    void removeALikeFromAMovie();
-
-    List<Film> outputMovieByLikes();
+    Film addFilm(Film filmFromRequest);
 }
