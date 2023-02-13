@@ -4,9 +4,12 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
+    @PositiveOrZero
     private int id;
     @NotBlank(message = "Название не может быть пустым.")
     private final String name;
@@ -17,4 +20,5 @@ public class Film {
     private final LocalDate releaseDate;
     @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
     private final int duration;
+    private final Set<Integer> numOfLikes = new HashSet<>();
 }

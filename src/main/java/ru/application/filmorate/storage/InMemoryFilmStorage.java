@@ -3,13 +3,13 @@ package ru.application.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.FilmValidationException;
+import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -18,8 +18,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 1;
 
+    private int generatorId() {
+        return filmId++;
+    }
+
     public Film addFilm(Film filmFromRequest) {
-        log.info("Получен запрос 'POST /films'");
         if (films.containsValue(filmFromRequest)) {
             String exceptionMessage = "Фильм с таким названием " + filmFromRequest.getName() + " уже добавлен.";
             log.warn("Ошибка при добавлении фильма. Текст исключения: {}", exceptionMessage);
@@ -32,13 +35,44 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    public Film updateFilm(Film filmFromRequest) {
-        log.info("Получен запрос 'PUT /films'");
-        if (!films.containsKey(filmFromRequest.getId())) {
+    @Override
+    public Film addLike(Integer id, Integer userId) {
+        checkFilmInFilms(id);
+        Film film = films.get(id);
+        film.getNumOfLikes().add(userId);
+        return film;
+    }
+
+    @Override
+    public Film removeLike(Integer id, Integer userId) {
+        checkFilmInFilms(id);
+        Film film = films.get(id);
+        if (!film.getNumOfLikes().contains(userId)) {
             String exceptionMessage = "Такого фильма нет в списке.";
-            log.warn("Ошибка при обновлении фильма. Текст исключения: {}", exceptionMessage);
-            throw new FilmValidationException(exceptionMessage);
+            log.warn("Текст исключения: {}", exceptionMessage);
+            throw new ObjectWasNotFoundException(exceptionMessage);
         }
+        film.getNumOfLikes().remove(userId);
+        return film;
+    }
+
+    @Override
+    public List<Film> listTheTenMostPopularMoviesByTheNumberOfLikes(Integer count) {
+        Comparator<Film> comparator = (f1, f2) -> f2.getNumOfLikes().size() - f1.getNumOfLikes().size();
+        return films.values().stream()
+                .sorted(comparator)
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Film> getFilmById(Integer filmId) {
+        checkFilmInFilms(filmId);
+        return Optional.ofNullable(films.get(filmId));
+    }
+
+    public Film updateFilm(Film filmFromRequest) {
+        checkFilmInFilms(filmFromRequest.getId());
         Film film = validateFilm(filmFromRequest);
         films.remove(filmFromRequest.getId());
         films.put(film.getId(), film);
@@ -46,14 +80,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    public List<Film> getFilms() {
-        log.info("Получен запрос 'GET /films'");
+    public List<Film> getAllFilms() {
         log.debug("Текущее количество фильмов: {}", films.size());
         return List.copyOf(films.values());
-    }
-
-    private int generatorId() {
-        return filmId++;
     }
 
     private Film validateFilm(Film film) {
@@ -64,5 +93,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new FilmValidationException(exceptionMessage);
         }
         return film;
+    }
+
+    private void checkFilmInFilms(Integer id) {
+        if (!films.containsKey(id)) {
+            String exceptionMessage = "Такого фильма нет в списке.";
+            log.warn("Текст исключения: {}", exceptionMessage);
+            throw new ObjectWasNotFoundException(exceptionMessage);
+        }
     }
 }

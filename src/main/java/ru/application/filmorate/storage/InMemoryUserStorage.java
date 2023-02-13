@@ -2,12 +2,12 @@ package ru.application.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.exception.UserValidationException;
 import ru.application.filmorate.model.User;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -16,7 +16,6 @@ public class InMemoryUserStorage implements UserStorage {
     private int userId = 1;
 
     public User createUser(User userFromRequest) {
-        log.info("Получен запрос 'POST /users'");
         if (users.containsValue(userFromRequest)) {
             String exceptionMessage = "Пользователь уже зарегестрирован.";
             log.warn("Ошибка при добавлении пользователя. Текст исключения: {}", exceptionMessage);
@@ -29,13 +28,30 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
+    public List<User> getUsers() {
+        log.debug("Текущее количество пользователей: {}", users.size());
+        return List.copyOf(users.values());
+    }
+
+    public List<User> listOfFriends(Integer id) {
+        checkUserInUsers(id);
+        return users.get(id).getFriendsId().stream()
+                .map(users::get)
+                .collect(Collectors.toList());
+    }
+
+    public List<User> listOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
+        checkUserInUsers(id);
+        checkUserInUsers(otherId);
+        Set<Integer> otherUserFriends = new HashSet<>(users.get(otherId).getFriendsId());
+        otherUserFriends.retainAll(users.get(id).getFriendsId());
+        return otherUserFriends.stream()
+                .map(users::get)
+                .collect(Collectors.toList());
+    }
+
     public User updateUser(User userFromRequest) {
-        log.info("Получен запрос 'PUT /users'");
-        if (!users.containsKey(userFromRequest.getId())) {
-            String exceptionMessage = "Такого пользователя нет в списке.";
-            log.warn("Ошибка при обновлении пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
+        checkUserInUsers(userFromRequest.getId());
         User user = validationUser(userFromRequest);
         users.remove(userFromRequest.getId());
         users.put(user.getId(), user);
@@ -43,10 +59,33 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    public List<User> getUsers() {
-        log.info("Получен запрос 'GET /users'");
-        log.debug("Текущее количество пользователей: {}", users.size());
-        return List.copyOf(users.values());
+    @Override
+    public User removeFriends(Integer id, Integer friendId) {
+        checkUserInUsers(id);
+        User user = users.get(id);
+        if (!user.getFriendsId().contains(friendId)) {
+            String exceptionMessage = "Такого пользователя нет в списке друзей.";
+            log.warn("Текст исключения: {}", exceptionMessage);
+            throw new UserValidationException(exceptionMessage);
+        }
+        user.getFriendsId().remove(friendId);
+        return user;
+    }
+
+    @Override
+    public List<User> allFriendsUser() {
+        return null;
+    }
+
+    @Override
+    public User addFriends(Integer id, Integer friendId) {
+        checkUserInUsers(id);
+        checkUserInUsers(friendId);
+        User user = users.get(id);
+        User userFriend = users.get(friendId);
+        user.getFriendsId().add(friendId);
+        userFriend.getFriendsId().add(id);
+        return user;
     }
 
     private int generatorId() {
@@ -63,5 +102,18 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(user.getLogin());
         }
         return user;
+    }
+
+    public Optional<User> getUserById(Integer userId) {
+        checkUserInUsers(userId);
+        return Optional.ofNullable(users.get(userId));
+    }
+
+    private void checkUserInUsers(Integer id) {
+        if (!users.containsKey(id)) {
+            String exceptionMessage = "Такого пользователя нет в списке.";
+            log.warn("Текст исключения: {}", exceptionMessage);
+            throw new ObjectWasNotFoundException(exceptionMessage);
+        }
     }
 }
