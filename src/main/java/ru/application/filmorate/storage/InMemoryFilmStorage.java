@@ -6,32 +6,54 @@ import ru.application.filmorate.exception.FilmValidationException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Film;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
-    private final static LocalDate THE_OLDEST_RELEASE_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
     private final Map<Integer, Film> films = new HashMap<>();
     private int filmId = 1;
 
-    private int generatorId() {
-        return filmId++;
+    @Override
+    public List<Film> get() {
+        log.debug("Текущее количество фильмов: {}", films.size());
+        return List.copyOf(films.values());
     }
 
-    public Film addFilm(Film filmFromRequest) {
-        if (films.containsValue(filmFromRequest)) {
-            String exceptionMessage = "Фильм с таким названием " + filmFromRequest.getName() + " уже добавлен.";
+    @Override
+    public Film getById(Integer filmId) {
+        checkFilmInFilms(filmId);
+        return films.get(filmId);
+    }
+
+    @Override
+    public List<Film> getPopularMoviesByLikes(Integer count) {
+        Comparator<Film> comparator = (f1, f2) -> f2.getNumOfLikes().size() - f1.getNumOfLikes().size();
+        return films.values().stream()
+                .sorted(comparator)
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Film add(Film film) {
+        if (films.containsValue(film)) {
+            String exceptionMessage = "Фильм с таким названием " + film.getName() + " уже добавлен.";
             log.warn("Ошибка при добавлении фильма. Текст исключения: {}", exceptionMessage);
             throw new FilmValidationException(exceptionMessage);
         }
-        Film film = validateFilm(filmFromRequest);
         film.setId(generatorId());
         films.put(film.getId(), film);
         log.info("Фильм был добавлен.");
+        return film;
+    }
+
+    @Override
+    public Film update(Film film) {
+        checkFilmInFilms(film.getId());
+        films.put(film.getId(), film);
+        log.info("Фильм был обновлен.");
         return film;
     }
 
@@ -56,50 +78,15 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    @Override
-    public List<Film> listTheTenMostPopularMoviesByTheNumberOfLikes(Integer count) {
-        Comparator<Film> comparator = (f1, f2) -> f2.getNumOfLikes().size() - f1.getNumOfLikes().size();
-        return films.values().stream()
-                .sorted(comparator)
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<Film> getFilmById(Integer filmId) {
-        checkFilmInFilms(filmId);
-        return Optional.ofNullable(films.get(filmId));
-    }
-
-    public Film updateFilm(Film filmFromRequest) {
-        checkFilmInFilms(filmFromRequest.getId());
-        Film film = validateFilm(filmFromRequest);
-        films.remove(filmFromRequest.getId());
-        films.put(film.getId(), film);
-        log.info("Фильм был обновлен.");
-        return film;
-    }
-
-    public List<Film> getAllFilms() {
-        log.debug("Текущее количество фильмов: {}", films.size());
-        return List.copyOf(films.values());
-    }
-
-    private Film validateFilm(Film film) {
-        String exceptionMessage;
-        if (film.getReleaseDate().isBefore(THE_OLDEST_RELEASE_DATE)) {
-            exceptionMessage = "Дата релиза не может быть раньше " + THE_OLDEST_RELEASE_DATE;
-            log.warn("Ошибка при валидации фильма. Текст исключения: {}", exceptionMessage);
-            throw new FilmValidationException(exceptionMessage);
-        }
-        return film;
-    }
-
     private void checkFilmInFilms(Integer id) {
         if (!films.containsKey(id)) {
             String exceptionMessage = "Такого фильма нет в списке.";
             log.warn("Текст исключения: {}", exceptionMessage);
             throw new ObjectWasNotFoundException(exceptionMessage);
         }
+    }
+
+    private int generatorId() {
+        return filmId++;
     }
 }

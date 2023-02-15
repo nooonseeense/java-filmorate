@@ -6,7 +6,6 @@ import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -17,39 +16,43 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User createUser(User user) {
-        return userStorage.createUser(user);
+    public List<User> get() {
+        return userStorage.get();
     }
 
-    public List<User> getUsers() {
-        return userStorage.getUsers();
+    public User getById(Integer userId) {
+        return userStorage.getById(userId);
     }
 
-    public List<User> listOfFriends(Integer id) {
-        return userStorage.listOfFriends(id);
+    public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
+        return userStorage.getListOfFriendsSharedWithAnotherUser(id, otherId);
     }
 
-    public List<User> listOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
-        return userStorage.listOfFriendsSharedWithAnotherUser(id, otherId);
+    public List<User> getListOfFriends(Integer id) {
+        return userStorage.getListOfFriends(id);
     }
 
-    public User updateUser(User user) {
-        return userStorage.updateUser(user);
+    public User create(User user) {
+        validation(user);
+        return userStorage.create(user);
+    }
+
+    public User update(User user) {
+        validation(user);
+        return userStorage.update(user);
     }
 
     public User addFriends(Integer id, Integer friendId) {
         return userStorage.addFriends(id, friendId);
     }
 
-    public List<User> allFriendsUser() {
-        return userStorage.allFriendsUser();
-    }
-
-    public Optional<User> getUserById(Integer userId) {
-        return userStorage.getUserById(userId);
-    }
-
     public User removeFriends(Integer id, Integer friendId) {
         return userStorage.removeFriends(id, friendId);
+    }
+
+    private void validation(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }

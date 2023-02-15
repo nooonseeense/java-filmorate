@@ -1,6 +1,7 @@
 package ru.application.filmorate.model;
 
 import lombok.Data;
+import ru.application.filmorate.annotation.ValidDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public class Film {
     @Size(max = 200, message = "Максимальная длина описания — 200 символов.")
     private final String description;
     @NotNull(message = "Необходимо заполнить дату релиза.")
+    @ValidDate(year = 1895, m = 12, day = 28)
     private final LocalDate releaseDate;
     @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
     private final int duration;

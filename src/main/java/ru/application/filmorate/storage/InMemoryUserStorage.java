@@ -15,32 +15,20 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> users = new HashMap<>();
     private int userId = 1;
 
-    public User createUser(User userFromRequest) {
-        if (users.containsValue(userFromRequest)) {
-            String exceptionMessage = "Пользователь уже зарегестрирован.";
-            log.warn("Ошибка при добавлении пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        User user = validationUser(userFromRequest);
-        user.setId(generatorId());
-        users.put(user.getId(), user);
-        log.info("Пользователь создан.");
-        return user;
-    }
-
-    public List<User> getUsers() {
+    @Override
+    public List<User> get() {
         log.debug("Текущее количество пользователей: {}", users.size());
         return List.copyOf(users.values());
     }
 
-    public List<User> listOfFriends(Integer id) {
-        checkUserInUsers(id);
-        return users.get(id).getFriendsId().stream()
-                .map(users::get)
-                .collect(Collectors.toList());
+    @Override
+    public User getById(Integer userId) {
+        checkUserInUsers(userId);
+        return users.get(userId);
     }
 
-    public List<User> listOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
+    @Override
+    public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
         checkUserInUsers(id);
         checkUserInUsers(otherId);
         Set<Integer> otherUserFriends = new HashSet<>(users.get(otherId).getFriendsId());
@@ -50,10 +38,30 @@ public class InMemoryUserStorage implements UserStorage {
                 .collect(Collectors.toList());
     }
 
-    public User updateUser(User userFromRequest) {
-        checkUserInUsers(userFromRequest.getId());
-        User user = validationUser(userFromRequest);
-        users.remove(userFromRequest.getId());
+    @Override
+    public List<User> getListOfFriends(Integer id) {
+        checkUserInUsers(id);
+        return users.get(id).getFriendsId().stream()
+                .map(users::get)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public User create(User user) {
+        if (users.containsValue(user)) {
+            String exceptionMessage = "Пользователь уже зарегестрирован.";
+            log.warn("Ошибка при добавлении пользователя. Текст исключения: {}", exceptionMessage);
+            throw new UserValidationException(exceptionMessage);
+        }
+        user.setId(generatorId());
+        users.put(user.getId(), user);
+        log.info("Пользователь создан.");
+        return user;
+    }
+
+    @Override
+    public User update(User user) {
+        checkUserInUsers(user.getId());
         users.put(user.getId(), user);
         log.info("Пользователь обновлен.");
         return user;
@@ -73,11 +81,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> allFriendsUser() {
-        return null;
-    }
-
-    @Override
     public User addFriends(Integer id, Integer friendId) {
         checkUserInUsers(id);
         checkUserInUsers(friendId);
@@ -88,32 +91,15 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    private int generatorId() {
-        return userId++;
-    }
-
-    private User validationUser(User user) {
-        if (user.getLogin().matches(".*\\s+.*")) {
-            String exceptionMessage = "Логин не может содержать пробелы.";
-            log.warn("Ошибка при валидации пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        return user;
-    }
-
-    public Optional<User> getUserById(Integer userId) {
-        checkUserInUsers(userId);
-        return Optional.ofNullable(users.get(userId));
-    }
-
     private void checkUserInUsers(Integer id) {
         if (!users.containsKey(id)) {
             String exceptionMessage = "Такого пользователя нет в списке.";
             log.warn("Текст исключения: {}", exceptionMessage);
             throw new ObjectWasNotFoundException(exceptionMessage);
         }
+    }
+
+    private int generatorId() {
+        return userId++;
     }
 }

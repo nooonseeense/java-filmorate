@@ -1,5 +1,6 @@
 package ru.application.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -7,9 +8,9 @@ import ru.application.filmorate.model.Film;
 import ru.application.filmorate.storage.FilmStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
 
@@ -18,20 +19,24 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+    public List<Film> get() {
+        return filmStorage.get();
     }
 
-    public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+    public Film getById(Integer filmId) {
+        return filmStorage.getById(filmId);
     }
 
-    public Optional<Film> getFilmById(Integer filmId) {
-        return filmStorage.getFilmById(filmId);
+    public List<Film> getPopularMoviesByLikes(Integer count) {
+        return filmStorage.getPopularMoviesByLikes(count);
     }
 
-    public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+    public Film add(Film film) {
+        return filmStorage.add(film);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
     }
 
     public Film addLike(Integer id, Integer userId) {
@@ -40,9 +45,5 @@ public class FilmService {
 
     public Film removeLike(Integer id, Integer userId) {
         return filmStorage.removeLike(id, userId);
-    }
-
-    public List<Film> listTheTenMostPopularMoviesByTheNumberOfLikes(Integer count) {
-        return filmStorage.listTheTenMostPopularMoviesByTheNumberOfLikes(count);
     }
 }
