@@ -1,72 +1,62 @@
 package ru.application.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import ru.application.filmorate.exception.UserValidationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import ru.application.filmorate.model.User;
 import org.springframework.web.bind.annotation.*;
+import ru.application.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.HashMap;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
-import java.util.Map;
 
-@RequestMapping("/users")
+@Validated
 @RestController
-@Slf4j
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    private int userId = 1;
+    private final UserService userService;
 
-    private int generatorId() {
-        return userId++;
+    @GetMapping
+    public List<User> get() {
+        return userService.get();
+    }
+
+    @GetMapping("{userId}")
+    public User getById(@PositiveOrZero @PathVariable Integer userId) {
+        return userService.getById(userId);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public List<User> getListOfFriendsSharedWithAnotherUser(@PositiveOrZero @PathVariable Integer id,
+                                                            @PositiveOrZero @PathVariable Integer otherId) {
+        return userService.getListOfFriendsSharedWithAnotherUser(id, otherId);
+    }
+
+    @GetMapping("{id}/friends")
+    public List<User> getListOfFriends(@PathVariable Integer id) {
+        return userService.getListOfFriends(id);
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User userFromRequest) {
-        log.info("Получен запрос 'POST /users'");
-        if (users.containsValue(userFromRequest)) {
-            String exceptionMessage = "Пользователь уже зарегестрирован.";
-            log.warn("Ошибка при добавлении пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        User user = validationUser(userFromRequest);
-        user.setId(generatorId());
-        users.put(user.getId(), user);
-        log.info("Пользователь создан.");
-        return user;
+    public User create(@Valid @RequestBody User user) {
+        return userService.create(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User userFromRequest) {
-        log.info("Получен запрос 'PUT /users'");
-        if (!users.containsKey(userFromRequest.getId())) {
-            String exceptionMessage = "Такого пользователя нет в списке.";
-            log.warn("Ошибка при обновлении пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        User user = validationUser(userFromRequest);
-        users.remove(userFromRequest.getId());
-        users.put(user.getId(), user);
-        log.info("Пользователь обновлен.");
-        return user;
+    public User update(@Valid @RequestBody User user) {
+        return userService.update(user);
     }
 
-    private User validationUser(User user) {
-        if (user.getLogin().matches(".*\\s+.*")) {
-            String exceptionMessage = "Логин не может содержать пробелы.";
-            log.warn("Ошибка при валидации пользователя. Текст исключения: {}", exceptionMessage);
-            throw new UserValidationException(exceptionMessage);
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        return user;
+    @PutMapping("{id}/friends/{friendId}")
+    public User addFriends(@PositiveOrZero @PathVariable Integer id,
+                           @PositiveOrZero @PathVariable Integer friendId) {
+        return userService.addFriends(id, friendId);
     }
 
-    @GetMapping
-    public List<User> getUsers() {
-        log.info("Получен запрос 'GET /users'");
-        log.debug("Текущее количество пользователей: {}", users.size());
-        return List.copyOf(users.values());
+    @DeleteMapping("{id}/friends/{friendId}")
+    public User removeFriends(@PositiveOrZero @PathVariable Integer id,
+                              @PositiveOrZero @PathVariable Integer friendId) {
+        return userService.removeFriends(id, friendId);
     }
 }
