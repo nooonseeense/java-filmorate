@@ -22,5 +22,9 @@ public class Film {
     private final LocalDate releaseDate;
     @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
     private final int duration;
+    private final Mpa mpa;
+    private final int rating;
+    private final int likes;
     private final Set<Integer> numOfLikes = new HashSet<>();
+    private final Set<Genre> genres = new HashSet<>();
 }
