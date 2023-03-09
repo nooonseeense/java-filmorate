@@ -1,7 +1,9 @@
 package ru.application.filmorate.dao;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.UserStorage;
@@ -12,9 +14,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 @Qualifier("InDbUserStorage")
 public class UserDbStorageDao implements UserStorage {
+    private final JdbcTemplate jdbcTemplate;
+    private final FriendDao friendShipDao;
 
     public static User makeUser(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");

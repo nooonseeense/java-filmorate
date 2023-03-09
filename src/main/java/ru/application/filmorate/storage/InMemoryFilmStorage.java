@@ -1,7 +1,6 @@
 package ru.application.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.FilmValidationException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
@@ -30,7 +29,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularMoviesByLikes(Integer count) {
-        Comparator<Film> comparator = (f1, f2) -> f2.getNumOfLikes().size() - f1.getNumOfLikes().size();
+        Comparator<Film> comparator = (f1, f2) -> f2.getLikes().size() - f1.getLikes().size();
         return films.values().stream()
                 .sorted(comparator)
                 .limit(count)
@@ -62,7 +61,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film addLike(Integer id, Integer userId) {
         checkFilmInFilms(id);
         Film film = films.get(id);
-        film.getNumOfLikes().add(userId);
+        film.getLikes().add(userId);
         return film;
     }
 
@@ -70,12 +69,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film removeLike(Integer id, Integer userId) {
         checkFilmInFilms(id);
         Film film = films.get(id);
-        if (!film.getNumOfLikes().contains(userId)) {
+        if (!film.getLikes().contains(userId)) {
             String exceptionMessage = "Такого фильма нет в списке.";
             log.warn("Текст исключения: {}", exceptionMessage);
             throw new ObjectWasNotFoundException(exceptionMessage);
         }
-        film.getNumOfLikes().remove(userId);
+        film.getLikes().remove(userId);
         return film;
     }
 
