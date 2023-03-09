@@ -3,51 +3,51 @@ package ru.application.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.UserStorage;
+import ru.application.filmorate.dao.UserDbStorageDao;
 
 import java.util.List;
 
 @Service
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserDbStorageDao userDbStorageDao;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserDbStorageDao userDbStorageDao) {
+        this.userDbStorageDao = userDbStorageDao;
     }
 
     public List<User> get() {
-        return userStorage.get();
+        return userDbStorageDao.get();
     }
 
     public User getById(Integer userId) {
-        return userStorage.getById(userId);
+        return userDbStorageDao.getById(userId);
     }
 
     public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
-        return userStorage.getListOfFriendsSharedWithAnotherUser(id, otherId);
+        return userDbStorageDao.getListOfFriendsSharedWithAnotherUser(id, otherId);
     }
 
     public List<User> getListOfFriends(Integer id) {
-        return userStorage.getListOfFriends(id);
+        return userDbStorageDao.getListOfFriends(id);
     }
 
     public User create(User user) {
         validation(user);
-        return userStorage.create(user);
+        return userDbStorageDao.create(user);
     }
 
     public User update(User user) {
         validation(user);
-        return userStorage.update(user);
+        return userDbStorageDao.update(user);
     }
 
     public User addFriends(Integer id, Integer friendId) {
-        return userStorage.addFriends(id, friendId);
+        return userDbStorageDao.addFriends(id, friendId);
     }
 
     public User removeFriends(Integer id, Integer friendId) {
-        return userStorage.removeFriends(id, friendId);
+        return userDbStorageDao.removeFriends(id, friendId);
     }
 
     private void validation(User user) {

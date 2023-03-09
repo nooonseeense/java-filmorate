@@ -1,21 +1,22 @@
 package ru.application.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.application.filmorate.dao.MpaDao;
 import ru.application.filmorate.model.Mpa;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MpaService {
-    MpaDao mpaDao;
+    private final MpaDao mpaDao;
 
     public List<Mpa> get() {
-        return mpaDao;
+        return mpaDao.get();
     }
 
-    public Mpa getById(@PathVariable int id) {
-        return mpaDao;
+    public Mpa getById(int id) {
+        return mpaDao.getById(id);
     }
 }

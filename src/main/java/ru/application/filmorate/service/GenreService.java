@@ -1,5 +1,6 @@
 package ru.application.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.dao.GenreDao;
 import ru.application.filmorate.model.Genre;
@@ -7,14 +8,15 @@ import ru.application.filmorate.model.Genre;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GenreService {
-    GenreDao genreDao;
+    private final GenreDao genreDao;
 
     public List<Genre> get() {
-        return
+        return genreDao.get();
     }
 
     public Genre getById(int id) {
-        return
+        return genreDao.getById(id);
     }
 }
