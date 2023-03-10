@@ -11,7 +11,7 @@ import ru.application.filmorate.service.MpaService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/genres")
+@RequestMapping("/mpa")
 @RequiredArgsConstructor
 public class MpaController {
     private final MpaService mpaService;

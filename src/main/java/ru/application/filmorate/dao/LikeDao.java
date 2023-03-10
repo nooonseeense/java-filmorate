@@ -2,7 +2,6 @@ package ru.application.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
@@ -10,11 +9,12 @@ import ru.application.filmorate.model.User;
 
 import java.util.*;
 
+import static ru.application.filmorate.dao.UserStorageDao.makeUser;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class LikeDao {
-    private final UserDbStorageDao userDbStorageDao;
     private final JdbcTemplate jdbcTemplate;
 
     public void addLike(int id, int userId) {
@@ -53,7 +53,7 @@ public class LikeDao {
                 "FROM LIKE_FILM l " +
                 "LEFT JOIN USERS UF on l.USER_ID = UF.ID " +
                 "WHERE film_id = ? ";
-        List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> UserDbStorageDao.makeUser(rs), id);
+        List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
         Set<Integer> userIds = new HashSet<>();
         for (User user : users) {
             userIds.add(user.getId());

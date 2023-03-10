@@ -54,6 +54,4 @@ public class FilmGenreDao {
         String sql = "DELETE FROM FILM_GENRE WHERE film_id = ?";
         jdbcTemplate.update(sql, id);
     }
-
-
 }
