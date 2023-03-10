@@ -2,8 +2,10 @@ package ru.application.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Mpa;
 
@@ -30,10 +32,10 @@ public class MpaDao {
                 log.info("Получен MPA-рейтинг: id = {}, название = {}", mpa.getId(), mpa.getName());
             }
             return mpa;
-        } catch (ObjectWasNotFoundException e) {
+        } catch (EmptyResultDataAccessException e) {
             String message = String.format("MPA-рейтинг с id = %d не найден.", id);
             log.debug(message);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 

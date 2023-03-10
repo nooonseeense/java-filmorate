@@ -63,7 +63,7 @@ public class FilmDbStorageDao implements FilmStorage {
 
     @Override
     public List<Film> getPopularMoviesByLikes(Integer count) {
-        String sql = String.format("SELECT id, name, description, release_date, duration, mpa, rate, LIKES_AMOUNT \n" +
+        String sql = String.format("SELECT id, name, description, release_date, duration, mpa, rating, num_of_likes \n" +
                 "FROM FILM\n" +
                 "ORDER BY NUM_OF_LIKES DESC\n" +
                 "LIMIT %d", count

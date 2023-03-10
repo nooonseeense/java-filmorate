@@ -2,8 +2,10 @@ package ru.application.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Genre;
 
@@ -30,10 +32,10 @@ public class GenreDao {
                 log.info("Получен жанр: id = {}, название = {}", genre.getId(), genre.getName());
             }
             return genre;
-        } catch (ObjectWasNotFoundException e) {
+        } catch (EmptyResultDataAccessException e) {
             String message = "Жанр с id = " + id + " не найден.";
             log.debug(message);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 

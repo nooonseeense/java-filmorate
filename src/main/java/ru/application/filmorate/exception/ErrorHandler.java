@@ -62,4 +62,11 @@ public class ErrorHandler {
         log.warn("Текст исключения: Ошибка при обработке запроса.");
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler({ObjectDoesNotExist.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleObjectDoesNotExistException(final ObjectDoesNotExist e) {
+        log.warn("Текст исключения: Запрашиваемый объект не найден.");
+        return Map.of("error", e.getMessage());
+    }
 }
