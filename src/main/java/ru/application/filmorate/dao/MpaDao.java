@@ -6,7 +6,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
@@ -20,12 +19,12 @@ public class MpaDao {
     private final JdbcTemplate jdbcTemplate;
 
     public List<Mpa> get() {
-        String sql = "SELECT id, name FROM mpa";
+        String sql = "SELECT ID, NAME FROM MPA";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
     }
 
     public Mpa getById(int id) {
-        String sql = "SELECT id, name FROM mpa WHERE id = ?";
+        String sql = "SELECT ID, NAME FROM MPA WHERE ID = ?";
         try {
             Mpa mpa = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeMpa(rs), id);
             if (mpa != null) {

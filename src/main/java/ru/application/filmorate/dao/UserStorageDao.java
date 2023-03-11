@@ -31,11 +31,13 @@ public class UserStorageDao implements UserStorage {
         int id = rs.getInt("id");
         String email = rs.getString("email");
         String login = rs.getString("login");
+        String name = rs.getString("name");
         LocalDate birthday = rs.getDate("birthday").toLocalDate();
         return User.builder()
                 .id(id)
                 .email(email)
                 .login(login)
+                .name(name)
                 .birthday(birthday)
                 .build();
     }
@@ -45,22 +47,22 @@ public class UserStorageDao implements UserStorage {
         String sql = "SELECT ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM USERS";
         List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
         for (User user : users) {
-            List<User> friendUser = getListOfFriends(user.getId());
-            user.setFriendsId(friendUser.get(user.getId()).getFriendsId());
+            user.setFriendsId(convertToSetFromList(getListOfFriends(user.getId())));
         }
         return users;
     }
 
     @Override
     public User getById(Integer userId) {
-        String sql = "SELECT id, email, login, name, birthday " +
-                "FROM users " +
-                "WHERE id = ?";
+        String sql =
+                "SELECT id, email, login, name, birthday " +
+                        "FROM users " +
+                        "WHERE id = ?";
         try {
             User user = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeUser(rs), userId);
             if (user != null) {
                 log.info("Найден пользователь: c id = {} именем = {}", user.getId(), user.getName());
-                user.setFriendsId(convertToSetFromList(user));
+                user.setFriendsId(convertToSetFromList(getListOfFriends(user.getId())));
             }
             return user;
         } catch (EmptyResultDataAccessException e) {
@@ -72,23 +74,25 @@ public class UserStorageDao implements UserStorage {
 
     @Override
     public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
-        String sql = "SELECT u.id, u.email, u.login, u.name, u.birthday \n" +
-                "FROM friend AS f\n" +
-                "INNER JOIN users AS u ON f.user2_id = u.id\n" +
-                "WHERE user1_id = ? AND user2_id IN (\n" +
-                "        SELECT user2_id\n" +
-                "        FROM friend\n" +
-                "        WHERE user1_id = ?\n" +
-                "     )";
+        String sql =
+                "SELECT u.id, u.email, u.login, u.name, u.birthday \n" +
+                        "FROM friend AS f\n" +
+                        "INNER JOIN users AS u ON f.user2_id = u.id\n" +
+                        "WHERE user1_id = ? AND user2_id IN (\n" +
+                        "        SELECT user2_id\n" +
+                        "        FROM friend\n" +
+                        "        WHERE user1_id = ?\n" +
+                        "     )";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id, otherId);
     }
 
     @Override
-    public List<User> getListOfFriends(Integer id) {
-        String sql = "SELECT U.ID, U.EMAIL, U.LOGIN, U.NAME, U.BIRTHDAY " +
-                "FROM FRIEND AS F " +
-                "LEFT JOIN USERS AS U ON F.USER1_ID = U.ID " +
-                "WHERE USER1_ID = ?";
+    public List<User> getListOfFriends(Integer id) { // НЕПРАВИЛЬНЫЙ ЗАПРОУС
+        String sql =
+                "SELECT U.ID, U.EMAIL, U.LOGIN, U.NAME, U.BIRTHDAY " +
+                        "FROM FRIEND AS F " +
+                        "LEFT JOIN USERS AS U ON F.USER2_ID = U.ID " +
+                        "WHERE USER1_ID = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
     }
 
@@ -111,12 +115,12 @@ public class UserStorageDao implements UserStorage {
 
     @Override
     public User update(User user) {
-        String sqlQuery = "UPDATE USERS " +
-                "SET " +
+        String sqlQuery =
+                "UPDATE USERS SET " +
                 "EMAIL = ?, " +
                 "LOGIN = ?, " +
                 "NAME = ?, " +
-                "BIRTHDAY = ?" +
+                "BIRTHDAY = ? " +
                 "WHERE ID = ?";
         int updateRows = jdbcTemplate.update(
                 sqlQuery,
@@ -137,8 +141,9 @@ public class UserStorageDao implements UserStorage {
 
     @Override
     public User addFriends(Integer id, Integer friendId) {
-        String sql = "MERGE INTO friend f USING (VALUES (?,?)) S(user1, user2)\n" +
-                "ON f.user1_ID = S.user1 AND f.user2_ID = S.user2 \n" +
+        String sql =
+                "MERGE INTO FRIEND AS f USING (VALUES (?,?)) S(user1, user2)\n" +
+                "ON f.USER1_ID = S.user1 AND f.USER2_ID = S.user2 \n" +
                 "WHEN NOT MATCHED THEN INSERT VALUES (S.user1, S.user2)";
         try {
             jdbcTemplate.update(sql, id, friendId);
@@ -153,20 +158,21 @@ public class UserStorageDao implements UserStorage {
 
     @Override
     public User removeFriends(Integer id, Integer friendId) {
-        String sql = "MERGE INTO friend f USING (VALUES (?,?)) S(user1, user2)\n" +
+        String sql =
+                "MERGE INTO FRIEND AS f USING (VALUES (?,?)) S(user1, user2)\n" +
                 "ON f.user1_ID = S.user1 AND f.user2_ID = S.user2 \n" +
                 "WHEN MATCHED THEN DELETE";
         jdbcTemplate.update(sql, id, friendId);
         return getById(id);
     }
 
-    private Set<Integer> convertToSetFromList(User user) {
-        List<Integer> userFriends = new LinkedList<>();
-        Set<Integer> userFriendsList = user.getFriendsId();
-        for (User friend : getListOfFriends(user.getId())) {
-            userFriends.add(friend.getId());
+    private Set<Integer> convertToSetFromList(List<User> users) {
+        Set<Integer> commonUsers = new HashSet<>();
+        if (!users.isEmpty()) {
+            for (User friend : users) {
+                commonUsers.add(friend.getId());
+            }
         }
-        userFriendsList.addAll(userFriends);
-        return userFriendsList;
+        return commonUsers;
     }
 }

@@ -34,13 +34,7 @@ public class FilmDbStorageDao implements FilmStorage {
     @Override
     public List<Film> get() {
         String sql = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING, NUM_OF_LIKES FROM film";
-        List<Film> films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
-        films.forEach((film) -> {
-            film.setLikes(likeDao.getFilmLikes(film.getId()));
-            film.setGenres(filmGenreDao.get(film.getId()));
-            film.setMpa(mpaDao.getById(film.getMpa().getId()));
-        });
-        return films;
+        return getFilms(sql);
     }
 
     @Override
@@ -68,14 +62,22 @@ public class FilmDbStorageDao implements FilmStorage {
                 "ORDER BY NUM_OF_LIKES DESC\n" +
                 "LIMIT %d", count
         );
+        return getFilms(sql);
+    }
+
+    private List<Film> getFilms(String sql) {
         List<Film> films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
-        get();
+        films.forEach((film) -> {
+            film.setLikes(likeDao.getFilmLikes(film.getId()));
+            film.setGenres(filmGenreDao.get(film.getId()));
+            film.setMpa(mpaDao.getById(film.getMpa().getId()));
+        });
         return films;
     }
 
     @Override
     public Film add(Film film) {
-        String sql = "INSERT INTO FILM (name, description, release_date, duration, mpa, rating, num_of_likes) " +
+        String sql = "INSERT INTO FILM (NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING, NUM_OF_LIKES) " +
                 "VALUES (?,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
