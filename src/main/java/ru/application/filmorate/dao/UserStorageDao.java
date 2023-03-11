@@ -87,7 +87,7 @@ public class UserStorageDao implements UserStorage {
     }
 
     @Override
-    public List<User> getListOfFriends(Integer id) { // НЕПРАВИЛЬНЫЙ ЗАПРОУС
+    public List<User> getListOfFriends(Integer id) {
         String sql =
                 "SELECT U.ID, U.EMAIL, U.LOGIN, U.NAME, U.BIRTHDAY " +
                         "FROM FRIEND AS F " +
