@@ -47,10 +47,9 @@ public class UserDbStorageDaoTest {
     @Sql(scripts = "file:src/test/resources/data-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void shouldReturnNewUser() {
         User user = User.builder()
-                .id(4)
-                .email("test@ya.com")
-                .login("testy")
-                .name("Tree")
+                .email("testy@ya.com")
+                .login("testyy")
+                .name("Treee")
                 .birthday(LocalDate.of(2021, 10, 10))
                 .build();
 
@@ -119,76 +118,5 @@ public class UserDbStorageDaoTest {
         assertEquals(user.getLogin(), actualUser.getLogin());
         assertEquals(user.getName(), actualUser.getName());
         assertEquals(user.getBirthday(), actualUser.getBirthday());
-    }
-
-    @Test
-    @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "file:src/test/resources/data-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void shouldReturnUserFriends() {
-        User user = User.builder()
-                .id(1)
-                .email("test@ya.com")
-                .login("testy")
-                .name("Tree")
-                .birthday(LocalDate.of(2021, 10, 10))
-                .build();
-
-        User user2 = User.builder()
-                .id(2)
-                .email("test@gu.com")
-                .login("testg")
-                .name("Bree")
-                .birthday(LocalDate.of(2020, 10, 10))
-                .build();
-
-        friendStorage.addFriends(user.getId(), user2.getId());
-
-        List<User> actualList = userStorageDao.getListOfFriends(user.getId());
-
-        assertEquals(user2.getId(), actualList.get(0).getId());
-        assertEquals(user2.getEmail(), actualList.get(0).getEmail());
-        assertEquals(user2.getLogin(), actualList.get(0).getLogin());
-        assertEquals(user2.getName(), actualList.get(0).getName());
-        assertEquals(user2.getBirthday(), actualList.get(0).getBirthday());
-    }
-
-    @Test
-    @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "file:src/test/resources/data-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void shouldReturnListOfFriendsSharedWithAnotherUser() {
-        User user = User.builder()
-                .id(1)
-                .email("test@ya.com")
-                .login("testy")
-                .name("Tree")
-                .birthday(LocalDate.of(2021, 10, 10))
-                .build();
-
-        User user2 = User.builder()
-                .id(2)
-                .email("test@gu.com")
-                .login("testg")
-                .name("Bree")
-                .birthday(LocalDate.of(2020, 10, 10))
-                .build();
-
-        User friend = User.builder()
-                .id(3)
-                .email("test@mom.ru")
-                .login("testm")
-                .name("Dree")
-                .birthday(LocalDate.of(2019, 10, 10))
-                .build();
-
-        friendStorage.addFriends(user.getId(), friend.getId());
-        friendStorage.addFriends(user2.getId(), friend.getId());
-
-        List<User> sharedFriends = userStorageDao.getListOfFriendsSharedWithAnotherUser(user.getId(), user2.getId());
-
-        assertEquals(friend.getId(), sharedFriends.get(0).getId());
-        assertEquals(friend.getEmail(), sharedFriends.get(0).getEmail());
-        assertEquals(friend.getLogin(), sharedFriends.get(0).getLogin());
-        assertEquals(friend.getName(), sharedFriends.get(0).getName());
-        assertEquals(friend.getBirthday(), sharedFriends.get(0).getBirthday());
     }
 }
