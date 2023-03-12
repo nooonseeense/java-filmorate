@@ -2,7 +2,6 @@ package ru.application.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,7 +9,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Film;
+import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.model.Mpa;
+import ru.application.filmorate.storage.FilmGenreStorage;
 import ru.application.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
@@ -18,35 +19,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Qualifier("InDbFilmStorage")
-public class FilmDbStorageDao implements FilmStorage {
+public class FilmDbStorageDao implements FilmStorage, FilmGenreStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmGenreDao filmGenreDao;
+    private final FilmGenreStorage filmGenreStorage;
     private final LikeDao likeDao;
     private final MpaDao mpaDao;
 
-    @Override
     public List<Film> get() {
-        String sql = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING, NUM_OF_LIKES FROM film";
+        String sql = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING FROM film";
         return getFilms(sql);
     }
 
-    @Override
     public Film getById(Integer filmId) {
-        String sql = "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING, NUM_OF_LIKES\n" +
-                "FROM FILM " +
-                "WHERE ID = ?";
+        String sql =
+                "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING\n" +
+                        "FROM FILM " +
+                        "WHERE ID = ?";
         try {
             Film film = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeFilm(rs), filmId);
             assert film != null;
-            film.setLikes(likeDao.getFilmLikes(filmId));
-            film.setGenres(filmGenreDao.get(filmId));
+            film.setGenres(get(filmId));
             film.setMpa(mpaDao.getById(film.getMpa().getId()));
             return film;
         } catch (EmptyResultDataAccessException e) {
@@ -55,11 +54,10 @@ public class FilmDbStorageDao implements FilmStorage {
         }
     }
 
-    @Override
     public List<Film> getPopularMoviesByLikes(Integer count) {
-        String sql = String.format("SELECT id, name, description, release_date, duration, mpa, rating, num_of_likes \n" +
+        String sql = String.format("SELECT id, name, description, release_date, duration, mpa, rating \n" +
                 "FROM FILM\n" +
-                "ORDER BY NUM_OF_LIKES DESC\n" +
+                "ORDER BY rating DESC\n" +
                 "LIMIT %d", count
         );
         return getFilms(sql);
@@ -68,17 +66,15 @@ public class FilmDbStorageDao implements FilmStorage {
     private List<Film> getFilms(String sql) {
         List<Film> films = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
         films.forEach((film) -> {
-            film.setLikes(likeDao.getFilmLikes(film.getId()));
-            film.setGenres(filmGenreDao.get(film.getId()));
+            film.setGenres(get(film.getId()));
             film.setMpa(mpaDao.getById(film.getMpa().getId()));
         });
         return films;
     }
 
-    @Override
     public Film add(Film film) {
-        String sql = "INSERT INTO FILM (NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING, NUM_OF_LIKES) " +
-                "VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO FILM (NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA) " +
+                "VALUES (?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement preparedStatement = connection.prepareStatement(sql, new String[]{"id"});
@@ -87,8 +83,6 @@ public class FilmDbStorageDao implements FilmStorage {
             preparedStatement.setDate(3, Date.valueOf(film.getReleaseDate()));
             preparedStatement.setInt(4, film.getDuration());
             preparedStatement.setInt(5, film.getMpa().getId());
-            preparedStatement.setInt(6, film.getRating());
-            preparedStatement.setInt(7, 0);
             return preparedStatement;
         }, keyHolder);
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
@@ -96,27 +90,24 @@ public class FilmDbStorageDao implements FilmStorage {
         if (film.getGenres() == null || film.getGenres().isEmpty()) {
             return film;
         }
-        filmGenreDao.insert(film);
+        insert(film);
         return film;
     }
 
-    @Override
     public Film update(Film film) {
         String sql = "UPDATE FILM " +
                 "SET NAME = ?, " +
                 "description = ?, " +
                 "release_date = ?, " +
                 "duration = ?, " +
-                "mpa = ?, " +
-                "rating = ? " +
-                " WHERE id = ?";
+                "mpa = ? " +
+                "WHERE id = ?";
         int newRows = jdbcTemplate.update(sql,
                 film.getName(),
                 film.getDescription(),
                 Date.valueOf(film.getReleaseDate()),
                 film.getDuration(),
                 film.getMpa().getId(),
-                film.getRating(),
                 film.getId()
         );
         if (newRows == 0) {
@@ -124,21 +115,20 @@ public class FilmDbStorageDao implements FilmStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         } else {
-            filmGenreDao.removeById(film.getId());
+            removeById(film.getId());
             if (film.getGenres() == null || film.getGenres().isEmpty()) {
                 return film;
             }
         }
-        return filmGenreDao.insert(film);
+        return insert(film);
     }
 
-    @Override
     public Film addLike(Integer id, Integer userId) {
         likeDao.addLike(id, userId);
         return getById(id);
     }
 
-    @Override
+
     public Film removeLike(Integer id, Integer userId) {
         likeDao.removeLike(id, userId);
         return getById(id);
@@ -152,7 +142,6 @@ public class FilmDbStorageDao implements FilmStorage {
         int duration = rs.getInt("duration");
         Mpa mpa = new Mpa(rs.getInt("mpa"));
         int rating = rs.getInt("rating");
-        int numOfLikes = rs.getInt("NUM_OF_LIKES");
         return Film.builder()
                 .id(id)
                 .name(name)
@@ -161,7 +150,21 @@ public class FilmDbStorageDao implements FilmStorage {
                 .duration(duration)
                 .rating(rating)
                 .mpa(mpa)
-                .numOfLikes(numOfLikes)
                 .build();
+    }
+
+    @Override
+    public List<Genre> get(int id) {
+        return filmGenreStorage.get(id);
+    }
+
+    @Override
+    public Film insert(Film film) {
+        return filmGenreStorage.insert(film);
+    }
+
+    @Override
+    public void removeById(int id) {
+        filmGenreStorage.removeById(id);
     }
 }

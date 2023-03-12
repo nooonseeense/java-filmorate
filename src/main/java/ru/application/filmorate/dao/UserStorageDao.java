@@ -2,8 +2,6 @@ package ru.application.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.ObjectNotFoundException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -23,7 +21,6 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Qualifier("InDbUserStorage")
 public class UserStorageDao implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -45,11 +42,7 @@ public class UserStorageDao implements UserStorage {
     @Override
     public List<User> get() {
         String sql = "SELECT ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM USERS";
-        List<User> users = jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
-        for (User user : users) {
-            user.setFriendsId(convertToSetFromList(getListOfFriends(user.getId())));
-        }
-        return users;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
     }
 
     @Override
@@ -62,7 +55,6 @@ public class UserStorageDao implements UserStorage {
             User user = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeUser(rs), userId);
             if (user != null) {
                 log.info("Найден пользователь: c id = {} именем = {}", user.getId(), user.getName());
-                user.setFriendsId(convertToSetFromList(getListOfFriends(user.getId())));
             }
             return user;
         } catch (EmptyResultDataAccessException e) {
@@ -137,42 +129,5 @@ public class UserStorageDao implements UserStorage {
         } else {
             return user;
         }
-    }
-
-    @Override
-    public User addFriends(Integer id, Integer friendId) {
-        String sql =
-                "MERGE INTO FRIEND AS f USING (VALUES (?,?)) S(user1, user2)\n" +
-                "ON f.USER1_ID = S.user1 AND f.USER2_ID = S.user2 \n" +
-                "WHEN NOT MATCHED THEN INSERT VALUES (S.user1, S.user2)";
-        try {
-            jdbcTemplate.update(sql, id, friendId);
-            log.info("Пользователь с id = {} и id = {} стали друзьями.", id, friendId);
-            return getById(id);
-        } catch (ObjectNotFoundException e) {
-            String message = String.format("Пользователь с id = %d или id = %d не найден.", id, friendId);
-            log.debug(message);
-            throw new ObjectWasNotFoundException(message);
-        }
-    }
-
-    @Override
-    public User removeFriends(Integer id, Integer friendId) {
-        String sql =
-                "MERGE INTO FRIEND AS f USING (VALUES (?,?)) S(user1, user2)\n" +
-                "ON f.user1_ID = S.user1 AND f.user2_ID = S.user2 \n" +
-                "WHEN MATCHED THEN DELETE";
-        jdbcTemplate.update(sql, id, friendId);
-        return getById(id);
-    }
-
-    private Set<Integer> convertToSetFromList(List<User> users) {
-        Set<Integer> commonUsers = new HashSet<>();
-        if (!users.isEmpty()) {
-            for (User friend : users) {
-                commonUsers.add(friend.getId());
-            }
-        }
-        return commonUsers;
     }
 }

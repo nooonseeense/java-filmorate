@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.storage.FriendStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorageDaoTest {
     private final UserStorageDao userStorageDao;
+    private final FriendStorage friendStorage;
 
     @Test
     @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -139,7 +141,7 @@ public class UserDbStorageDaoTest {
                 .birthday(LocalDate.of(2020, 10, 10))
                 .build();
 
-        userStorageDao.addFriends(user.getId(), user2.getId());
+        friendStorage.addFriends(user.getId(), user2.getId());
 
         List<User> actualList = userStorageDao.getListOfFriends(user.getId());
 
@@ -178,8 +180,8 @@ public class UserDbStorageDaoTest {
                 .birthday(LocalDate.of(2019, 10, 10))
                 .build();
 
-        userStorageDao.addFriends(user.getId(), friend.getId());
-        userStorageDao.addFriends(user2.getId(), friend.getId());
+        friendStorage.addFriends(user.getId(), friend.getId());
+        friendStorage.addFriends(user2.getId(), friend.getId());
 
         List<User> sharedFriends = userStorageDao.getListOfFriendsSharedWithAnotherUser(user.getId(), user2.getId());
 

@@ -30,8 +30,7 @@ CREATE TABLE IF NOT EXISTS FILM (
     RELEASE_DATE DATE,
     DURATION     INTEGER,
     MPA          INTEGER,
-    RATING       INTEGER,
-    NUM_OF_LIKES INTEGER,
+    RATING       INTEGER DEFAULT 0,
     constraint FILM_PK
         primary key (ID),
     constraint MPA_FK
@@ -43,10 +42,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS FILM_ID_UINDEX
     on FILM (ID);
 
 CREATE TABLE IF NOT EXISTS FILM_GENRE (
+    ID       INTEGER NOT NULL auto_increment,
     FILM_ID  INTEGER NOT NULL,
     GENRE_ID INTEGER NOT NULL,
     constraint FILM_GENRE_PK
-        primary key (FILM_ID, GENRE_ID),
+        primary key (ID),
     constraint FILM_FK
         foreign key (FILM_ID) references FILM
             on update cascade on delete cascade,
@@ -62,7 +62,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS MPA_ID_UINDEX
     on MPA (ID);
 
 CREATE TABLE IF NOT EXISTS USERS (
-    ID       INTEGER                 auto_increment,
+    ID       INTEGER               auto_increment,
     EMAIL    CHARACTER VARYING(50) NOT NULL,
     LOGIN    CHARACTER VARYING(50) NOT NULL,
     NAME     CHARACTER VARYING(50),
@@ -71,11 +71,15 @@ CREATE TABLE IF NOT EXISTS USERS (
         primary key (ID)
 );
 
+create unique index if not exists USER_EMAIL_UINDEX on USERS (email);
+create unique index if not exists USER_LOGIN_UINDEX on USERS (login);
+
 CREATE TABLE IF NOT EXISTS FRIEND (
+    ID       INTEGER auto_increment,
     USER1_ID INTEGER NOT NULL,
     USER2_ID INTEGER NOT NULL,
     constraint FRIEND_PK
-        primary key (USER1_ID, USER2_ID),
+        primary key (ID),
     constraint FRIEND_USERS1_FK
         foreign key (USER1_ID) references USERS
             on update cascade on delete cascade,

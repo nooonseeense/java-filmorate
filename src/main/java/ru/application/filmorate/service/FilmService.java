@@ -1,8 +1,6 @@
 package ru.application.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.storage.FilmStorage;
@@ -14,7 +12,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(@Qualifier("InDbFilmStorage") @Lazy FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 

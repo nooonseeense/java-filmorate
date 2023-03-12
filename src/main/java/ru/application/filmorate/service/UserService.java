@@ -1,10 +1,9 @@
 package ru.application.filmorate.service;
 
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.storage.FriendStorage;
 import ru.application.filmorate.storage.UserStorage;
 
 import java.util.List;
@@ -12,10 +11,12 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
     @Autowired
-    public UserService(@Qualifier("InDbUserStorage") UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendStorage friendStorage) {
         this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
     }
 
     public List<User> get() {
@@ -45,11 +46,11 @@ public class UserService {
     }
 
     public User addFriends(Integer id, Integer friendId) {
-        return userStorage.addFriends(id, friendId);
+        return friendStorage.addFriends(id, friendId);
     }
 
     public User removeFriends(Integer id, Integer friendId) {
-        return userStorage.removeFriends(id, friendId);
+        return friendStorage.removeFriends(id, friendId);
     }
 
     private void validation(User user) {

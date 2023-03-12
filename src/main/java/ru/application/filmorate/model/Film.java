@@ -3,14 +3,12 @@ package ru.application.filmorate.model;
 import jdk.jshell.Snippet;
 import lombok.Builder;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 import ru.application.filmorate.annotation.ValidDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Builder
@@ -27,9 +25,9 @@ public class Film {
     private final LocalDate releaseDate;
     @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
     private int duration;
+    @NotNull
     private Mpa mpa;
+    @JsonIgnore
     private int rating;
-    private int numOfLikes;
-    private Set<Integer> likes = new HashSet<>();
     private List<Genre> genres = new ArrayList<>();
 }

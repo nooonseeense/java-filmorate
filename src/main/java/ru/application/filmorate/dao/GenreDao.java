@@ -6,7 +6,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Genre;
 
 import java.sql.ResultSet;
@@ -39,7 +38,7 @@ public class GenreDao {
         }
     }
 
-    public Genre makeGenre(ResultSet rs) throws SQLException {
+    public static Genre makeGenre(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String name = rs.getString("name");
         return new Genre(id, name);
