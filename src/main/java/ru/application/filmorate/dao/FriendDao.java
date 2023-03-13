@@ -7,21 +7,22 @@ import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.FriendStorage;
-import ru.application.filmorate.storage.UserStorage;
+
+import java.util.List;
+
+import static ru.application.filmorate.dao.UserStorageDao.makeUser;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class FriendDao implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final UserStorage userStorage;
 
-    public User addFriends(Integer id, Integer friendId) {
+    public void addFriends(Integer id, Integer friendId) {
         String sql = "INSERT INTO FRIEND(USER1_ID, USER2_ID) VALUES (?, ?)";
         try {
             jdbcTemplate.update(sql, id, friendId);
             log.info("Пользователь с id = {} и id = {} стали друзьями.", id, friendId);
-            return userStorage.getById(id);
         } catch (ObjectWasNotFoundException e) {
             String message = String.format("Пользователь с id = %d или id = %d не найден.", id, friendId);
             log.debug(message);
@@ -29,12 +30,29 @@ public class FriendDao implements FriendStorage {
         }
     }
 
-    public User removeFriends(Integer id, Integer friendId) {
+    public void removeFriends(Integer id, Integer friendId) {
         String sql =
                 "MERGE INTO FRIEND AS f USING (VALUES (?,?)) S(user1, user2)\n" +
                         "ON f.user1_ID = S.user1 AND f.user2_ID = S.user2 \n" +
                         "WHEN MATCHED THEN DELETE";
         jdbcTemplate.update(sql, id, friendId);
-        return userStorage.getById(id);
+    }
+
+    @Override
+    public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
+        String sql =
+                "SELECT * FROM USERS AS u, FRIEND AS f, FRIEND o " +
+                "WHERE u.ID = f.USER2_ID AND u.ID = o.USER2_ID AND f.USER1_ID = ? AND o.USER1_ID = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id, otherId);
+    }
+
+    @Override
+    public List<User> getListOfFriends(Integer id) {
+        String sql =
+                "SELECT U.ID, U.EMAIL, U.LOGIN, U.NAME, U.BIRTHDAY " +
+                        "FROM FRIEND AS F " +
+                        "LEFT JOIN USERS AS U ON F.USER2_ID = U.ID " +
+                        "WHERE USER1_ID = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
     }
 }

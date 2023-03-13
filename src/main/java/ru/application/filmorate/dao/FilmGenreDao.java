@@ -11,6 +11,7 @@ import ru.application.filmorate.storage.FilmGenreStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,9 +25,9 @@ public class FilmGenreDao implements FilmGenreStorage {
     public List<Genre> get(int id) {
         String sql =
                 "SELECT g.id, g.name " +
-                "FROM film_genre fg " +
-                "LEFT JOIN genre g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id = ?";
+                        "FROM film_genre fg " +
+                        "LEFT JOIN genre g ON fg.genre_id = g.id " +
+                        "WHERE fg.film_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> GenreDao.makeGenre(rs), id);
     }
 
@@ -49,7 +50,7 @@ public class FilmGenreDao implements FilmGenreStorage {
                         return genres.size();
                     }
                 });
-        film.setGenres(genres);
+        film.setGenres(new LinkedHashSet<>(genres));
         return film;
     }
 

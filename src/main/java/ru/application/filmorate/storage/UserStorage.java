@@ -9,10 +9,6 @@ public interface UserStorage {
 
     User getById(Integer userId);
 
-    List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId);
-
-    List<User> getListOfFriends(Integer id);
-
     User create(User user);
 
     User update(User user);

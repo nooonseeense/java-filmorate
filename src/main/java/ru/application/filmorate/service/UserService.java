@@ -28,11 +28,11 @@ public class UserService {
     }
 
     public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
-        return userStorage.getListOfFriendsSharedWithAnotherUser(id, otherId);
+        return friendStorage.getListOfFriendsSharedWithAnotherUser(id, otherId);
     }
 
     public List<User> getListOfFriends(Integer id) {
-        return userStorage.getListOfFriends(id);
+        return friendStorage.getListOfFriends(id);
     }
 
     public User create(User user) {
@@ -45,12 +45,12 @@ public class UserService {
         return userStorage.update(user);
     }
 
-    public User addFriends(Integer id, Integer friendId) {
-        return friendStorage.addFriends(id, friendId);
+    public void addFriends(Integer id, Integer friendId) {
+        friendStorage.addFriends(id, friendId);
     }
 
-    public User removeFriends(Integer id, Integer friendId) {
-        return friendStorage.removeFriends(id, friendId);
+    public void removeFriends(Integer id, Integer friendId) {
+        friendStorage.removeFriends(id, friendId);
     }
 
     private void validation(User user) {

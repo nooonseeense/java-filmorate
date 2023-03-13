@@ -1,6 +1,5 @@
 package ru.application.filmorate.model;
 
-import jdk.jshell.Snippet;
 import lombok.Builder;
 import lombok.Data;
 import net.minidev.json.annotate.JsonIgnore;
@@ -29,5 +28,5 @@ public class Film {
     private Mpa mpa;
     @JsonIgnore
     private int rating;
-    private List<Genre> genres = new ArrayList<>();
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 }

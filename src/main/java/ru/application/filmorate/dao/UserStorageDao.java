@@ -65,30 +65,6 @@ public class UserStorageDao implements UserStorage {
     }
 
     @Override
-    public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
-        String sql =
-                "SELECT u.id, u.email, u.login, u.name, u.birthday \n" +
-                        "FROM friend AS f\n" +
-                        "INNER JOIN users AS u ON f.user2_id = u.id\n" +
-                        "WHERE user1_id = ? AND user2_id IN (\n" +
-                        "        SELECT user2_id\n" +
-                        "        FROM friend\n" +
-                        "        WHERE user1_id = ?\n" +
-                        "     )";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id, otherId);
-    }
-
-    @Override
-    public List<User> getListOfFriends(Integer id) {
-        String sql =
-                "SELECT U.ID, U.EMAIL, U.LOGIN, U.NAME, U.BIRTHDAY " +
-                        "FROM FRIEND AS F " +
-                        "LEFT JOIN USERS AS U ON F.USER2_ID = U.ID " +
-                        "WHERE USER1_ID = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
-    }
-
-    @Override
     public User create(User user) {
         String sqlQuery = "insert into USERS (EMAIL, login, name, birthday) VALUES (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();

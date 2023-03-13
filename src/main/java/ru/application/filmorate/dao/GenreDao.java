@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Genre;
+import ru.application.filmorate.storage.GenreStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,14 +16,16 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class GenreDao {
+public class GenreDao implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    @Override
     public List<Genre> get() {
         String sql = "SELECT id, name FROM genre";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs));
     }
 
+    @Override
     public Genre getById(int id) {
         String sql = "SELECT id, name FROM genre WHERE id = ?";
         try {

@@ -2,9 +2,15 @@ package ru.application.filmorate.storage;
 
 import ru.application.filmorate.model.User;
 
+import java.util.List;
+
 public interface FriendStorage {
 
-    User addFriends(Integer id, Integer friendId);
+    void addFriends(Integer id, Integer friendId);
 
-    User removeFriends(Integer id, Integer friendId);
+    void removeFriends(Integer id, Integer friendId);
+
+    List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId);
+
+    List<User> getListOfFriends(Integer id);
 }

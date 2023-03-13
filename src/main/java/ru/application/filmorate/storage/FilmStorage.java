@@ -5,17 +5,15 @@ import ru.application.filmorate.model.Film;
 import java.util.List;
 
 public interface FilmStorage {
-    List<Film> get();
+    String get();
 
     Film getById(Integer filmId);
 
-    List<Film> getPopularMoviesByLikes(Integer count);
+    String getPopularMoviesByLikes(Integer count);
 
     Film add(Film film);
 
-    Film update(Film film);
+    void update(Film film);
 
-    Film addLike(Integer id, Integer userId);
-
-    Film removeLike(Integer id, Integer userId);
+    List<Film> getFilms(String sql);
 }
