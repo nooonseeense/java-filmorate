@@ -27,23 +27,27 @@ public class FilmDbStorageDao implements FilmStorage {
 
     @Override
     public String get() {
-        return "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING FROM film";
+        return "SELECT F.ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION, F.MPA, M.NAME, F.RATING " +
+                "FROM FILM AS F " +
+                "LEFT JOIN MPA AS M ON F.MPA = M.ID";
     }
 
     @Override
     public Film getById(Integer filmId) {
         String sql =
-                "SELECT ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA, RATING\n" +
-                        "FROM FILM " +
-                        "WHERE ID = ?";
+                "SELECT F.ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION, F.MPA, M.NAME, F.RATING " +
+                        "FROM FILM AS F " +
+                        "LEFT JOIN MPA AS M ON F.MPA = M.ID " +
+                        "WHERE F.ID = ?";
         return jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeFilm(rs), filmId);
     }
 
     @Override
     public String getPopularMoviesByLikes(Integer count) {
-        return String.format("SELECT id, name, description, release_date, duration, mpa, rating \n" +
-                "FROM FILM\n" +
-                "ORDER BY rating DESC\n" +
+        return String.format("SELECT F.ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION, F.MPA, M.NAME, F.RATING " +
+                "FROM FILM AS F " +
+                "LEFT JOIN MPA AS M ON F.MPA = M.ID " +
+                "ORDER BY rating DESC " +
                 "LIMIT %d", count
         );
     }
