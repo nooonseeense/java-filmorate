@@ -4,6 +4,7 @@ import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FilmGenreStorage {
 
@@ -12,4 +13,6 @@ public interface FilmGenreStorage {
     Film insert(Film film);
 
     void removeById(int id);
+
+    void test(List<Film> films);
 }

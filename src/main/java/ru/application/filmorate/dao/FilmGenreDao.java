@@ -13,6 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,7 +24,7 @@ public class FilmGenreDao implements FilmGenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Genre> get(int id) {
+    public List<Genre> get(int id) { // Зацикливание жанров
         String sql =
                 "SELECT g.id, g.name " +
                         "FROM film_genre fg " +
@@ -58,5 +60,13 @@ public class FilmGenreDao implements FilmGenreStorage {
     public void removeById(int id) {
         String sql = "DELETE FROM FILM_GENRE WHERE film_id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void test(List<Film> films) {
+        // TODO Произвести извлечение
+        Map<Integer, Film> filmsMap =  films.stream().collect(Collectors.toMap(Film::getId, Function.identity())); // Коллеция фильмов
+        // TODO Сделать SQL условие с IN https://www.baeldung.com/spring-jdbctemplate-in-list
+        // TODO Засетить значения в фильмы
     }
 }

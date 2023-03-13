@@ -40,7 +40,7 @@ public class LikeDao implements LikeStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
-        jdbcTemplate.update(sql2, id);
+        updateRate(id);
     }
 
     private void updateRate(long filmId) {

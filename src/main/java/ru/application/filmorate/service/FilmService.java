@@ -9,6 +9,9 @@ import ru.application.filmorate.storage.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -75,8 +78,11 @@ public class FilmService {
     }
 
     private List<Film> getFilms(String sql) {
-        List<Film> films = filmStorage.getFilms(sql);
-        films.forEach((film) -> {
+        List<Film> films = filmStorage.getFilms(sql); // Получили фильм
+
+        filmGenreStorage.test(films);
+        // filmGenreStorage. - добавит метод
+        films.forEach((film) -> { // Нужно избавить от цикла
             film.setGenres(new LinkedHashSet<>(filmGenreStorage.get(film.getId())));
             film.setMpa(mpaStorage.getById(film.getMpa().getId()));
         });
