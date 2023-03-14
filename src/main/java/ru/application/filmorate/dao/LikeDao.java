@@ -23,7 +23,6 @@ public class LikeDao implements LikeStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
-        updateRate(id);
     }
 
     @Override
@@ -37,13 +36,5 @@ public class LikeDao implements LikeStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
-        updateRate(id);
-    }
-
-    private void updateRate(long filmId) {
-        String sql = "UPDATE FILM f SET RATING = (SELECT count(l.user_id) " +
-                "FROM LIKE_FILM AS l where l.film_id = f.ID) " +
-                "WHERE ID = ?";
-        jdbcTemplate.update(sql, filmId);
     }
 }

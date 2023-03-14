@@ -3,7 +3,6 @@ package ru.application.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import net.minidev.json.annotate.JsonIgnore;
 import ru.application.filmorate.annotation.ValidDate;
 
 import javax.validation.constraints.*;
@@ -28,7 +27,5 @@ public class Film {
     private Mpa mpa;
     @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
     private int duration;
-    @JsonIgnore
-    private int rating;
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 }

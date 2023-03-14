@@ -34,8 +34,7 @@ public class Mapper {
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         Mpa mpa = new Mpa(rs.getInt("mpa.id"), rs.getString("mpa.name"));
         int duration = rs.getInt("duration");
-        int rating = rs.getInt("rating");
-        return new Film(id, name, description, releaseDate, mpa, duration, rating, new LinkedHashSet<>());
+        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>());
     }
 
     public static Mpa mpaMapper(ResultSet rs, int row) throws SQLException {

@@ -30,7 +30,6 @@ public class FilmService {
             Film film = filmStorage.getById(filmId);
             assert film != null;
             film.setGenres(new LinkedHashSet<>(filmGenreStorage.get(filmId)));
-            film.setMpa(mpaStorage.getById(film.getMpa().getId()));
             return film;
         } catch (EmptyResultDataAccessException e) {
             String message = String.format("Фильм с идентификатором %d не найден.", filmId);

@@ -46,7 +46,7 @@ public class FilmDbStorageDao implements FilmStorage {
 
     @Override
     public List<Film> getPopularMoviesByLikes(Integer count) {
-        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME, f.RATING " +
+        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
                 "FROM FILM as f " +
                 "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
                 "LEFT JOIN MPA m on m.ID = f.MPA " +
