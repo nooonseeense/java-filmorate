@@ -1,4 +1,4 @@
-package ru.application.filmorate.storage;
+package ru.application.filmorate.impl;
 
 import ru.application.filmorate.model.Film;
 
@@ -15,7 +15,7 @@ public interface FilmStorage {
 
     Film update(Film film);
 
-    Film addLike(Integer id, Integer userId);
+    void addGenres(Film film);
 
-    Film removeLike(Integer id, Integer userId);
+    void removeGenres(Film film);
 }

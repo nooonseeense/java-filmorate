@@ -49,14 +49,14 @@ public class UserController {
     }
 
     @PutMapping("{id}/friends/{friendId}")
-    public User addFriends(@PositiveOrZero @PathVariable Integer id,
+    public void addFriends(@PositiveOrZero @PathVariable Integer id,
                            @PositiveOrZero @PathVariable Integer friendId) {
-        return userService.addFriends(id, friendId);
+        userService.addFriends(id, friendId);
     }
 
     @DeleteMapping("{id}/friends/{friendId}")
-    public User removeFriends(@PositiveOrZero @PathVariable Integer id,
+    public void removeFriends(@PositiveOrZero @PathVariable Integer id,
                               @PositiveOrZero @PathVariable Integer friendId) {
-        return userService.removeFriends(id, friendId);
+        userService.removeFriends(id, friendId);
     }
 }

@@ -1,49 +1,67 @@
 package ru.application.filmorate.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.storage.FilmStorage;
+import ru.application.filmorate.impl.*;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
-@Slf4j
+@AllArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
-
-    @Autowired
-    public FilmService(@Lazy FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
+    private final LikeStorage likeStorage;
+    private final FilmGenreStorage filmGenreStorage;
+    private final MpaStorage mpaStorage;
 
     public List<Film> get() {
-        return filmStorage.get();
+        List<Film> films = filmStorage.get();
+        filmGenreStorage.setGenres(films);
+        return films;
     }
 
     public Film getById(Integer filmId) {
-        return filmStorage.getById(filmId);
+        try {
+            Film film = filmStorage.getById(filmId);
+            assert film != null;
+            film.setGenres(new LinkedHashSet<>(filmGenreStorage.get(filmId)));
+            return film;
+        } catch (EmptyResultDataAccessException e) {
+            String message = String.format("Фильм с идентификатором %d не найден.", filmId);
+            throw new ObjectWasNotFoundException(message);
+        }
     }
 
     public List<Film> getPopularMoviesByLikes(Integer count) {
-        return filmStorage.getPopularMoviesByLikes(count);
+        List<Film> popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count);
+        filmGenreStorage.setGenres(popularMoviesByLikes);
+        return popularMoviesByLikes;
     }
 
     public Film add(Film film) {
-        return filmStorage.add(film);
+        mpaStorage.setMpa(film);
+        Film newFilm = filmStorage.add(film);
+        filmGenreStorage.setGenres(Collections.singletonList(newFilm));
+        return film;
     }
 
     public Film update(Film film) {
-        return filmStorage.update(film);
+        mpaStorage.setMpa(film);
+        Film updatedFilm = filmStorage.update(film);
+        filmGenreStorage.setGenres(Collections.singletonList(updatedFilm));
+        return film;
     }
 
-    public Film addLike(Integer id, Integer userId) {
-        return filmStorage.addLike(id, userId);
+    public void addLike(Integer id, Integer userId) {
+        likeStorage.addLike(id, userId);
     }
 
-    public Film removeLike(Integer id, Integer userId) {
-        return filmStorage.removeLike(id, userId);
+    public void removeLike(Integer id, Integer userId) {
+        likeStorage.removeLike(id, userId);
     }
 }
