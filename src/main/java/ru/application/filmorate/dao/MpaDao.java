@@ -6,11 +6,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
+import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Mpa;
-import ru.application.filmorate.storage.MpaStorage;
+import ru.application.filmorate.impl.MpaStorage;
+import ru.application.filmorate.util.Mapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -22,14 +22,14 @@ public class MpaDao implements MpaStorage {
     @Override
     public List<Mpa> get() {
         String sql = "SELECT ID, NAME FROM MPA";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
+        return jdbcTemplate.query(sql, Mapper::mpaMapper);
     }
 
     @Override
     public Mpa getById(int id) {
         String sql = "SELECT ID, NAME FROM MPA WHERE ID = ?";
         try {
-            Mpa mpa = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeMpa(rs), id);
+            Mpa mpa = jdbcTemplate.queryForObject(sql, Mapper::mpaMapper, id);
             if (mpa != null) {
                 log.info("Получен MPA-рейтинг: id = {}, название = {}", mpa.getId(), mpa.getName());
             }
@@ -41,9 +41,10 @@ public class MpaDao implements MpaStorage {
         }
     }
 
-    private Mpa makeMpa(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        return new Mpa(id, name);
+    @Override
+    public void setMpa(Film film) {
+        Mpa mpa = jdbcTemplate.queryForObject("SELECT ID, NAME FROM MPA WHERE ID = ?",
+                Mapper::mpaMapper, film.getMpa().getId());
+        film.setMpa(mpa);
     }
 }

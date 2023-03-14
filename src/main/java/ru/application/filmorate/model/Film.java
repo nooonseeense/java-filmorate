@@ -1,5 +1,6 @@
 package ru.application.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import net.minidev.json.annotate.JsonIgnore;
@@ -11,6 +12,7 @@ import java.util.*;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class Film {
     @PositiveOrZero
     private int id;
@@ -22,10 +24,10 @@ public class Film {
     @NotNull(message = "Необходимо заполнить дату релиза.")
     @ValidDate(year = 1895, m = 12, day = 28)
     private final LocalDate releaseDate;
-    @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
-    private int duration;
     @NotNull
     private Mpa mpa;
+    @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
+    private int duration;
     @JsonIgnore
     private int rating;
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();

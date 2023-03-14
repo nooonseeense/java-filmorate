@@ -3,7 +3,7 @@ package ru.application.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.storage.GenreStorage;
+import ru.application.filmorate.impl.GenreStorage;
 
 import java.util.List;
 

@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.FriendStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorageDaoTest {
     private final UserStorageDao userStorageDao;
-    private final FriendStorage friendStorage;
 
     @Test
     @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)

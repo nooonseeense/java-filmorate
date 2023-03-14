@@ -1,4 +1,4 @@
-package ru.application.filmorate.storage;
+package ru.application.filmorate.impl;
 
 import ru.application.filmorate.model.User;
 

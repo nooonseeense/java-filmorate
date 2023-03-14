@@ -3,8 +3,8 @@ package ru.application.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.FriendStorage;
-import ru.application.filmorate.storage.UserStorage;
+import ru.application.filmorate.impl.FriendStorage;
+import ru.application.filmorate.impl.UserStorage;
 
 import java.util.List;
 

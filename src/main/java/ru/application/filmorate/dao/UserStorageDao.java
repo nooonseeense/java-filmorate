@@ -9,13 +9,11 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.UserStorage;
+import ru.application.filmorate.impl.UserStorage;
+import ru.application.filmorate.util.Mapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -24,25 +22,10 @@ import java.util.*;
 public class UserStorageDao implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public static User makeUser(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-        return User.builder()
-                .id(id)
-                .email(email)
-                .login(login)
-                .name(name)
-                .birthday(birthday)
-                .build();
-    }
-
     @Override
     public List<User> get() {
         String sql = "SELECT ID, EMAIL, LOGIN, NAME, BIRTHDAY FROM USERS";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
+        return jdbcTemplate.query(sql, Mapper::userMapper);
     }
 
     @Override
@@ -52,7 +35,7 @@ public class UserStorageDao implements UserStorage {
                         "FROM users " +
                         "WHERE id = ?";
         try {
-            User user = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeUser(rs), userId);
+            User user = jdbcTemplate.queryForObject(sql, Mapper::userMapper, userId);
             if (user != null) {
                 log.info("Найден пользователь: c id = {} именем = {}", user.getId(), user.getName());
             }
@@ -85,11 +68,11 @@ public class UserStorageDao implements UserStorage {
     public User update(User user) {
         String sqlQuery =
                 "UPDATE USERS SET " +
-                "EMAIL = ?, " +
-                "LOGIN = ?, " +
-                "NAME = ?, " +
-                "BIRTHDAY = ? " +
-                "WHERE ID = ?";
+                        "EMAIL = ?, " +
+                        "LOGIN = ?, " +
+                        "NAME = ?, " +
+                        "BIRTHDAY = ? " +
+                        "WHERE ID = ?";
         int updateRows = jdbcTemplate.update(
                 sqlQuery,
                 user.getEmail(),

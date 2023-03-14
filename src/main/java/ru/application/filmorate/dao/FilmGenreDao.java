@@ -2,16 +2,17 @@ package ru.application.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.storage.FilmGenreStorage;
+import ru.application.filmorate.impl.FilmGenreStorage;
+import ru.application.filmorate.util.Mapper;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,51 +23,37 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FilmGenreDao implements FilmGenreStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Override
-    public List<Genre> get(int id) { // Зацикливание жанров
-        String sql =
-                "SELECT g.id, g.name " +
-                        "FROM film_genre fg " +
-                        "LEFT JOIN genre g ON fg.genre_id = g.id " +
-                        "WHERE fg.film_id = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> GenreDao.makeGenre(rs), id);
+    public List<Genre> get(int id) {
+        String sql = "SELECT g.ID, g.NAME " +
+                "FROM FILM_GENRE AS fg " +
+                "LEFT JOIN GENRE AS g ON fg.GENRE_ID = g.ID " +
+                "WHERE fg.FILM_ID = ?";
+        return jdbcTemplate.query(sql, Mapper::genreMapper, id);
     }
 
     @Override
-    public Film insert(Film film) {
-        List<Genre> genres = film.getGenres()
-                .stream()
-                .distinct()
-                .collect(Collectors.toList());
-        String sql = "INSERT INTO FILM_GENRE(FILM_ID, GENRE_ID) VALUES(?,?)";
+    public void setGenres(List<Film> films) {
+        if (films != null) {
+            String sqlGenres = "SELECT FILM_ID, g.* " +
+                    "FROM FILM_GENRE " +
+                    "JOIN GENRE AS g ON g.ID = FILM_GENRE.GENRE_ID " +
+                    "WHERE FILM_GENRE.FILM_ID IN (:filmsId)";
 
-        jdbcTemplate.batchUpdate(sql,
-                new BatchPreparedStatementSetter() {
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, film.getId());
-                        ps.setInt(2, genres.get(i).getId());
-                    }
+            List<Integer> filmsId = films.stream().map(Film::getId).collect(Collectors.toList());
+            Map<Integer, Film> filmsMap = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
 
-                    public int getBatchSize() {
-                        return genres.size();
-                    }
-                });
-        film.setGenres(new LinkedHashSet<>(genres));
-        return film;
-    }
+            SqlParameterSource source = new MapSqlParameterSource("filmsId", filmsId);
+            SqlRowSet set = namedJdbcTemplate.queryForRowSet(sqlGenres, source);
 
-    @Override
-    public void removeById(int id) {
-        String sql = "DELETE FROM FILM_GENRE WHERE film_id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public void test(List<Film> films) {
-        // TODO Произвести извлечение
-        Map<Integer, Film> filmsMap =  films.stream().collect(Collectors.toMap(Film::getId, Function.identity())); // Коллеция фильмов
-        // TODO Сделать SQL условие с IN https://www.baeldung.com/spring-jdbctemplate-in-list
-        // TODO Засетить значения в фильмы
+            while (set.next()) {
+                int filmId = set.getInt("film_id");
+                int genreId = set.getInt("id");
+                String genreName = set.getString("name");
+                filmsMap.get(filmId).getGenres().add(new Genre(genreId, genreName));
+            }
+        }
     }
 }

@@ -7,10 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.storage.GenreStorage;
+import ru.application.filmorate.impl.GenreStorage;
+import ru.application.filmorate.util.Mapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -22,14 +21,14 @@ public class GenreDao implements GenreStorage {
     @Override
     public List<Genre> get() {
         String sql = "SELECT id, name FROM genre";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs));
+        return jdbcTemplate.query(sql, Mapper::genreMapper);
     }
 
     @Override
     public Genre getById(int id) {
         String sql = "SELECT id, name FROM genre WHERE id = ?";
         try {
-            Genre genre = jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> makeGenre(rs), id);
+            Genre genre = jdbcTemplate.queryForObject(sql, Mapper::genreMapper, id);
             if (genre != null) {
                 log.info("Получен жанр: id = {}, название = {}", genre.getId(), genre.getName());
             }
@@ -39,11 +38,5 @@ public class GenreDao implements GenreStorage {
             log.debug(message);
             throw new ObjectDoesNotExist(message);
         }
-    }
-
-    public static Genre makeGenre(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        return new Genre(id, name);
     }
 }

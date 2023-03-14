@@ -1,38 +1,28 @@
 package ru.application.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.storage.*;
+import ru.application.filmorate.impl.*;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
     private final LikeStorage likeStorage;
     private final FilmGenreStorage filmGenreStorage;
     private final MpaStorage mpaStorage;
 
-    @Autowired
-    public FilmService(FilmStorage filmStorage,
-                       LikeStorage likeStorage,
-                       FilmGenreStorage filmGenreStorage,
-                       MpaStorage mpaStorage) {
-        this.filmStorage = filmStorage;
-        this.likeStorage = likeStorage;
-        this.filmGenreStorage = filmGenreStorage;
-        this.mpaStorage = mpaStorage;
-    }
-
     public List<Film> get() {
-        return getFilms(filmStorage.get());
+        List<Film> films = filmStorage.get();
+        filmGenreStorage.setGenres(films);
+        return films;
     }
 
     public Film getById(Integer filmId) {
@@ -49,24 +39,23 @@ public class FilmService {
     }
 
     public List<Film> getPopularMoviesByLikes(Integer count) {
-        return getFilms(filmStorage.getPopularMoviesByLikes(count));
+        List<Film> popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count);
+        filmGenreStorage.setGenres(popularMoviesByLikes);
+        return popularMoviesByLikes;
     }
 
     public Film add(Film film) {
-        filmStorage.add(film);
-        if (film.getGenres() == null || film.getGenres().isEmpty()) {
-            return film;
-        }
-        return filmGenreStorage.insert(film);
+        mpaStorage.setMpa(film);
+        Film newFilm = filmStorage.add(film);
+        filmGenreStorage.setGenres(Collections.singletonList(newFilm));
+        return film;
     }
 
     public Film update(Film film) {
-        filmStorage.update(film);
-        filmGenreStorage.removeById(film.getId());
-        if (film.getGenres() == null || film.getGenres().isEmpty()) {
-            return film;
-        }
-        return filmGenreStorage.insert(film);
+        mpaStorage.setMpa(film);
+        Film updatedFilm = filmStorage.update(film);
+        filmGenreStorage.setGenres(Collections.singletonList(updatedFilm));
+        return film;
     }
 
     public void addLike(Integer id, Integer userId) {
@@ -75,17 +64,5 @@ public class FilmService {
 
     public void removeLike(Integer id, Integer userId) {
         likeStorage.removeLike(id, userId);
-    }
-
-    private List<Film> getFilms(String sql) {
-        List<Film> films = filmStorage.getFilms(sql); // Получили фильм
-
-        filmGenreStorage.test(films);
-        // filmGenreStorage. - добавит метод
-        films.forEach((film) -> { // Нужно избавить от цикла
-            film.setGenres(new LinkedHashSet<>(filmGenreStorage.get(film.getId())));
-            film.setMpa(mpaStorage.getById(film.getMpa().getId()));
-        });
-        return films;
     }
 }

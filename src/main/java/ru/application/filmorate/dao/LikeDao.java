@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.storage.LikeStorage;
+import ru.application.filmorate.impl.LikeStorage;
 
 @Component
 @RequiredArgsConstructor
@@ -30,9 +30,6 @@ public class LikeDao implements LikeStorage {
     public void removeLike(int id, int userId) {
         String sql = "DELETE FROM LIKE_FILM  " +
                 "WHERE FILM_ID = ? AND USER_ID = ?";
-        String sql2 = "UPDATE FILM\n" +
-                "SET RATING = RATING - 1\n" +
-                "WHERE ID = ?";
         try {
             jdbcTemplate.update(sql, id, userId);
         } catch (ObjectWasNotFoundException e) {

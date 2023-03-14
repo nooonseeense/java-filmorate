@@ -6,11 +6,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.FriendStorage;
+import ru.application.filmorate.impl.FriendStorage;
+import ru.application.filmorate.util.Mapper;
 
 import java.util.List;
-
-import static ru.application.filmorate.dao.UserStorageDao.makeUser;
 
 @Component
 @RequiredArgsConstructor
@@ -42,8 +41,8 @@ public class FriendDao implements FriendStorage {
     public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
         String sql =
                 "SELECT * FROM USERS AS u, FRIEND AS f, FRIEND o " +
-                "WHERE u.ID = f.USER2_ID AND u.ID = o.USER2_ID AND f.USER1_ID = ? AND o.USER1_ID = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id, otherId);
+                        "WHERE u.ID = f.USER2_ID AND u.ID = o.USER2_ID AND f.USER1_ID = ? AND o.USER1_ID = ?";
+        return jdbcTemplate.query(sql, Mapper::userMapper, id, otherId);
     }
 
     @Override
@@ -53,6 +52,6 @@ public class FriendDao implements FriendStorage {
                         "FROM FRIEND AS F " +
                         "LEFT JOIN USERS AS U ON F.USER2_ID = U.ID " +
                         "WHERE USER1_ID = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs), id);
+        return jdbcTemplate.query(sql, Mapper::userMapper, id);
     }
 }

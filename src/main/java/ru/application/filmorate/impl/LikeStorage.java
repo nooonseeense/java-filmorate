@@ -1,4 +1,4 @@
-package ru.application.filmorate.storage;
+package ru.application.filmorate.impl;
 
 public interface LikeStorage {
     void addLike(int id, int userId);
