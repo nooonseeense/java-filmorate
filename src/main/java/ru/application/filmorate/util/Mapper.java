@@ -1,9 +1,6 @@
 package ru.application.filmorate.util;
 
-import ru.application.filmorate.model.Film;
-import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.model.Mpa;
-import ru.application.filmorate.model.User;
+import ru.application.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,6 +44,17 @@ public class Mapper {
         return Genre.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
+                .build();
+    }
+
+    public static Review reviewMapper(ResultSet rs, int row) throws SQLException {
+        return Review.builder()
+                .id(rs.getInt("id"))
+                .content(rs.getString("content"))
+                .isPositive(rs.getBoolean("is_positive"))
+                .userId(rs.getInt("user_id"))
+                .filmId(rs.getInt("film_id"))
+                .useful(rs.getInt("useful"))
                 .build();
     }
 }

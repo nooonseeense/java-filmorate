@@ -29,6 +29,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleReviewValidateEx(final ReviewValidationException e) {
+        log.warn("Текст исключения: Ошибка при валидации отзыва.");
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFoundEx(final ObjectWasNotFoundException e) {
         log.warn("Текст исключения: Объект не был найден.");
