@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class FilmorateApplication {
     public static void main(String[] args) {
-        // init
+        // init_add_director
         SpringApplication.run(FilmorateApplication.class, args);
     }
 }
