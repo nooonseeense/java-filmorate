@@ -1,7 +1,9 @@
 package ru.application.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.impl.LikeStorage;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
@@ -9,14 +11,18 @@ import ru.application.filmorate.impl.UserStorage;
 import java.util.List;
 
 @Service
+@Slf4j
 public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
+    
+    private final LikeStorage likeStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage, FriendStorage friendStorage) {
+    public UserService(UserStorage userStorage, FriendStorage friendStorage, LikeStorage likeStorage) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
+        this.likeStorage = likeStorage;
     }
 
     public List<User> get() {
@@ -32,6 +38,7 @@ public class UserService {
     }
 
     public List<User> getListOfFriends(Integer id) {
+        userStorage.getById(id);
         return friendStorage.getListOfFriends(id);
     }
 
@@ -58,4 +65,20 @@ public class UserService {
             user.setName(user.getLogin());
         }
     }
+
+    /**
+     * Метод удаления пользователя по ID
+     *
+     * @param id id пользователя
+     */
+    public void removeUserById(Integer id) {
+        log.debug("Получен запрос на удаление пользователя по id = {}", id);
+        userStorage.removeUserById(id);
+        //likeStorage.removeUserAndLikes(id);
+        //friendStorage.removeUserAndFriends(id);
+
+    }
+
 }
+
+

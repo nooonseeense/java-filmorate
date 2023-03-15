@@ -13,4 +13,6 @@ public interface FriendStorage {
     List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId);
 
     List<User> getListOfFriends(Integer id);
+
+    void removeUserAndFriends(Integer id);
 }

@@ -3,6 +3,7 @@ package ru.application.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -87,6 +88,17 @@ public class UserStorageDao implements UserStorage {
             throw new ObjectWasNotFoundException(message);
         } else {
             return user;
+        }
+    }
+
+    @Override
+    public void removeUserById(Integer id) {
+        String sql = "DELETE FROM USERS  " +
+                "WHERE ID = ? ";
+        if (jdbcTemplate.update(sql, id) == 0) {
+            String message = String.format("Пользователь с id = %d не найден.", id);
+            log.debug(message);
+            throw new ObjectWasNotFoundException(message);
         }
     }
 }

@@ -37,4 +37,11 @@ public class LikeDao implements LikeStorage {
             throw new ObjectWasNotFoundException(message);
         }
     }
+
+    @Override
+    public void removeUserAndLikes(Integer id) {
+        String sql = "DELETE FROM LIKE_FILM  " +
+                "WHERE USER_ID = ? ";
+        jdbcTemplate.update(sql, id);
+    }
 }
