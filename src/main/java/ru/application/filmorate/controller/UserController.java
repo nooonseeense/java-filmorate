@@ -2,8 +2,10 @@ package ru.application.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import ru.application.filmorate.model.User;
 import org.springframework.web.bind.annotation.*;
+import ru.application.filmorate.model.Feed;
+import ru.application.filmorate.model.User;
+import ru.application.filmorate.service.FeedService;
 import ru.application.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final FeedService feedService;
 
     @GetMapping
     public List<User> get() {
@@ -58,5 +61,10 @@ public class UserController {
     public void removeFriends(@PositiveOrZero @PathVariable Integer id,
                               @PositiveOrZero @PathVariable Integer friendId) {
         userService.removeFriends(id, friendId);
+    }
+
+    @GetMapping("{id}/feed")
+    public List<Feed> getUserFeed(@PathVariable Integer id) {
+        return feedService.getFeedByUserId(id);
     }
 }

@@ -1,9 +1,8 @@
 package ru.application.filmorate.util;
 
-import ru.application.filmorate.model.Film;
-import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.model.Mpa;
-import ru.application.filmorate.model.User;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
+import ru.application.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +12,7 @@ import java.util.*;
 public class Mapper {
 
     public static User userMapper(ResultSet rs, int row) throws SQLException {
+//public static User userMapper(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String email = rs.getString("email");
         String login = rs.getString("login");
@@ -47,6 +47,17 @@ public class Mapper {
         return Genre.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
+                .build();
+    }
+
+    public static Feed feedMapper(ResultSet rs, int row) throws SQLException {
+        return Feed.builder()
+                .eventId(rs.getInt("id"))
+                .timestamp(rs.getTimestamp("timestamp"))
+                .userId(rs.getInt("user_id"))
+                .eventType(rs.getObject(rs.getString("event_type"), EventType.class))
+                .operation(rs.getObject(rs.getString("operation"), Operation.class))
+                .entityId(rs.getInt("entity_id"))
                 .build();
     }
 }
