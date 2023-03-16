@@ -10,7 +10,7 @@ public interface FilmStorage {
     Film getById(Integer filmId);
 
     List<Film> getPopularMoviesByLikes(Integer count);
-    List<Film> getPopularMoviesFromAdvancedSearch(String query);
+    List<Film> getPopularMoviesFromAdvancedSearch(String query, String by);
 
     List<Film> getCommonMovies(Integer userId, Integer friendId);
 

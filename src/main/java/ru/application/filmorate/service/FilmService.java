@@ -59,12 +59,11 @@ public class FilmService {
         if (query.equals(UNKNOWN) & by.equals(UNKNOWN)) {
             resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesByLikes(10);
             log.debug("Получен запрос на список из 10 популярных фильмов");
-        } else if (!query.equals(UNKNOWN) & by.equals(TITLE)) {
-            resultPopularMoviesFromAdvancedSearch  = filmStorage.getPopularMoviesFromAdvancedSearch(query);
-            log.debug("Получен запрос на список из 10 популярных фильмов где в названии используется {}", query);
-        }
-        //log.debug("Получен запрос на список из {} популярных фильмов", count);
 
+        } else {
+            resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
+            log.debug("Получен запрос на исполнение функционального поиска искомой строкой {} в разделе {}", query, by);
+        }
         filmGenreStorage.setGenres(resultPopularMoviesFromAdvancedSearch);
         return resultPopularMoviesFromAdvancedSearch;
     }

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.application.filmorate.util.Constants.*;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -59,22 +61,31 @@ public class FilmDbStorageDao implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularMoviesFromAdvancedSearch(String query) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME FROM FILM as f ");
-        //sql.append("WHERE f.NAME LIKE '%").append(query).append("%' ");
-        sql.append("LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+    public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
+        StringBuilder sql = new StringBuilder("SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                "FROM FILM as f " +
+                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
                 "LEFT JOIN MPA m on m.ID = f.MPA " +
-                "GROUP BY f.ID, lf.FILM_ID IN ( " +
+                "LEFT JOIN FILM_DIRECTOR fd on f.ID = fd.ID " +
+                "LEFT JOIN DIRECTOR d on fd.ID = d.ID ");
+        if (by.equals(TITLE)) {
+            sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals(DIRECTOR)) {
+            sql.append("WHERE LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals(DIRECTOR_AND_TITLE) || by.equals(TITLE_AND_DIRECTOR)){
+            sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') OR ");
+            sql.append("LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
+        }
+        sql.append("GROUP BY f.ID, lf.FILM_ID IN ( " +
                 "SELECT FILM_ID " +
                 "FROM LIKE_FILM) " +
-                "ORDER BY COUNT(lf.film_id) DESC " +
-                "LIMIT 10");
- //       String sql = "SELECT * FROM FILM as f WHERE f.NAME LIKE '%up%'";
-
+                "ORDER BY COUNT(lf.film_id) DESC");
 
         return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
     }
+
 
     @Override
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {
