@@ -126,4 +126,15 @@ public class FilmDbStorageDao implements FilmStorage {
         String sql = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         jdbcTemplate.update(sql, film.getId());
     }
+
+    @Override
+    public void removeFilmById(Integer id) {
+        String sql = "DELETE FROM FILM  " +
+                     "WHERE ID = ? ";
+        if (jdbcTemplate.update(sql, id) == 0) {
+            String message = String.format("Фильм с id = %d не найден.", id);
+            log.debug(message);
+            throw new ObjectWasNotFoundException(message);
+        }
+    }
 }

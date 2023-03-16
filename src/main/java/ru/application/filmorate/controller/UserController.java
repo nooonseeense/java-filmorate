@@ -63,6 +63,11 @@ public class UserController {
         userService.removeFriends(id, friendId);
     }
 
+    @DeleteMapping("{userId}")
+    public void removeUserById(@PositiveOrZero @PathVariable Integer userId) {
+        userService.removeUserById(userId);
+    }
+
     @GetMapping("{id}/feed")
     public List<Feed> getUserFeed(@PathVariable Integer id) {
         return feedService.getFeedByUserId(id);

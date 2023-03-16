@@ -18,4 +18,11 @@ public interface FilmStorage {
     void addGenres(Film film);
 
     void removeGenres(Film film);
+
+    /**
+     * Метод удаления фильма по ID
+     *
+     * @param id id фильма
+     */
+    void removeFilmById(Integer id);
 }
