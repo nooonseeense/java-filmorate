@@ -13,15 +13,14 @@ import javax.validation.constraints.PositiveOrZero;
 @AllArgsConstructor
 public class Review {
 
-    private int id;
+    @PositiveOrZero
+    private int reviewId;
     @NotBlank
     private String content;
     @NotNull
     private Boolean isPositive;
-    @PositiveOrZero
     @NotNull
     private Integer userId;
-    @PositiveOrZero
     @NotNull
     private Integer filmId;
     private int useful;
