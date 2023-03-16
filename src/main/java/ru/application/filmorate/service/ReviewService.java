@@ -28,13 +28,15 @@ public class ReviewService {
     public Review add(Review review) {
         validateReview(review);
         Review addedReview = reviewStorage.add(review);
-        feedService.createFeed(addedReview.getUserId(), EventType.REVIEW, Operation.ADD, addedReview.getId());
+        feedService.createFeed(addedReview.getUserId(), EventType.REVIEW, Operation.ADD, addedReview.getReviewId());
         return addedReview;
-            }
+    }
 
     public Review update(Review review) {
         validateReview(review);
-        return reviewStorage.update(review);
+        Review updatedReview = reviewStorage.update(review);
+        feedService.createFeed(updatedReview.getUserId(), EventType.REVIEW, Operation.UPDATE, updatedReview.getReviewId());
+        return updatedReview;
     }
 
     public Review getById(Integer reviewId) {
@@ -50,7 +52,9 @@ public class ReviewService {
             log.debug("Отзыв с id {} не найден.", reviewId);
             throw new ObjectWasNotFoundException(String.format("Отзыв с id %d не найден.", reviewId));
         }
+        Review deletedReview = getById(reviewId);
         reviewStorage.delete(reviewId);
+        feedService.createFeed(deletedReview.getUserId(), EventType.REVIEW, Operation.REMOVE, deletedReview.getReviewId());
     }
 
     public List<Review> getAllByFilm(Integer filmId, Integer count) {
