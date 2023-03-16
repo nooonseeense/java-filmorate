@@ -36,7 +36,7 @@ public class ReviewStorageDao implements ReviewStorage {
             rs.setInt(5, 0);
             return rs;
         }, keyHolder);
-        review.setId(Objects.requireNonNull(keyHolder.getKey().intValue()));
+        review.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
         return review;
     }

@@ -1,6 +1,5 @@
 package ru.application.filmorate.util;
 
-import ru.application.filmorate.model.*;
 import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.model.*;
@@ -8,7 +7,7 @@ import ru.application.filmorate.model.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.LinkedHashSet;
 
 public class Mapper {
 
@@ -63,11 +62,11 @@ public class Mapper {
 
     public static Feed feedMapper(ResultSet rs, int row) throws SQLException {
         return Feed.builder()
-                .eventId(rs.getInt("id"))
+                .eventId(rs.getInt("event_id"))
                 .timestamp(rs.getTimestamp("timestamp"))
                 .userId(rs.getInt("user_id"))
-                .eventType(rs.getObject(rs.getString("event_type"), EventType.class))
-                .operation(rs.getObject(rs.getString("operation"), Operation.class))
+                .eventType(EventType.valueOf(rs.getString("event_type")))
+                .operation(Operation.valueOf(rs.getString("operation")))
                 .entityId(rs.getInt("entity_id"))
                 .build();
     }

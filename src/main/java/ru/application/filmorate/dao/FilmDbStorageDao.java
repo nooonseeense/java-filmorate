@@ -8,8 +8,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.Film;
 import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
 
@@ -130,7 +130,7 @@ public class FilmDbStorageDao implements FilmStorage {
     @Override
     public void removeFilmById(Integer id) {
         String sql = "DELETE FROM FILM  " +
-                     "WHERE ID = ? ";
+                "WHERE ID = ? ";
         if (jdbcTemplate.update(sql, id) == 0) {
             String message = String.format("Фильм с id = %d не найден.", id);
             log.debug(message);

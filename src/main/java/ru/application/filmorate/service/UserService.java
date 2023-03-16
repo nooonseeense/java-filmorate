@@ -1,27 +1,23 @@
 package ru.application.filmorate.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.impl.LikeStorage;
-import ru.application.filmorate.model.User;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
+import ru.application.filmorate.model.User;
 
 import java.util.List;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
-
-
-    @Autowired
-    public UserService(UserStorage userStorage, FriendStorage friendStorage) {
-        this.userStorage = userStorage;
-        this.friendStorage = friendStorage;
-    }
+    private final FeedService feedService;
 
     public List<User> get() {
         return userStorage.get();
@@ -52,10 +48,12 @@ public class UserService {
 
     public void addFriends(Integer id, Integer friendId) {
         friendStorage.addFriends(id, friendId);
+        feedService.createFeed(id, EventType.FRIEND, Operation.ADD, friendId);
     }
 
     public void removeFriends(Integer id, Integer friendId) {
         friendStorage.removeFriends(id, friendId);
+        feedService.createFeed(id, EventType.FRIEND, Operation.REMOVE, friendId);
     }
 
     private void validation(User user) {
@@ -73,7 +71,6 @@ public class UserService {
         log.debug("Получен запрос на удаление пользователя по id = {}", id);
         userStorage.removeUserById(id);
     }
-
 }
 
 

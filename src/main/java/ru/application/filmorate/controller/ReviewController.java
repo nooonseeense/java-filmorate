@@ -3,7 +3,6 @@ package ru.application.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Review;
 import ru.application.filmorate.service.ReviewService;
 
