@@ -12,15 +12,13 @@ import javax.validation.constraints.*;
 public class Review {
 
     @PositiveOrZero
-    private int id;
+    private int reviewId;
     @NotBlank
     private String content;
     @NotNull
     private Boolean isPositive;
-    @PositiveOrZero
     @NotNull
     private Integer userId;
-    @PositiveOrZero
     @NotNull
     private Integer filmId;
     private int useful;

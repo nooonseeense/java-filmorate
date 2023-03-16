@@ -5,6 +5,8 @@ drop table if exists LIKE_FILM cascade;
 drop table if exists USERS cascade;
 drop table if exists FILM_GENRE cascade;
 drop table if exists FRIEND cascade;
+drop table if exists REVIEW cascade;
+drop table if exists REVIEW_RATING cascade;
 
 CREATE TABLE IF NOT EXISTS GENRE (
                                      ID   INTEGER NOT NULL,
@@ -117,8 +119,8 @@ CREATE TABLE IF NOT EXISTS REVIEW (
                                     USER_ID      INTEGER,
                                     FILM_ID      INTEGER,
                                     USEFUL       INTEGER,
-                                    FOREIGN KEY (USER_ID) REFERENCES USERS (id) ON DELETE CASCADE,
-                                    FOREIGN KEY (FILM_ID) REFERENCES FILM (ID) ON DELETE CASCADE
+                                    FOREIGN KEY (USER_ID) REFERENCES USERS (id) ON UPDATE CASCADE ON DELETE CASCADE,
+                                    FOREIGN KEY (FILM_ID) REFERENCES FILM (ID) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS REVIEW_RATING (

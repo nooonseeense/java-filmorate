@@ -49,7 +49,7 @@ public class Mapper {
 
     public static Review reviewMapper(ResultSet rs, int row) throws SQLException {
         return Review.builder()
-                .id(rs.getInt("id"))
+                .reviewId(rs.getInt("id"))
                 .content(rs.getString("content"))
                 .isPositive(rs.getBoolean("is_positive"))
                 .userId(rs.getInt("user_id"))
