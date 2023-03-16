@@ -59,6 +59,24 @@ public class FilmDbStorageDao implements FilmStorage {
     }
 
     @Override
+    public List<Film> getPopularMoviesFromAdvancedSearch(String query) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME FROM FILM as f ");
+        //sql.append("WHERE f.NAME LIKE '%").append(query).append("%' ");
+        sql.append("LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                "LEFT JOIN MPA m on m.ID = f.MPA " +
+                "GROUP BY f.ID, lf.FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM LIKE_FILM) " +
+                "ORDER BY COUNT(lf.film_id) DESC " +
+                "LIMIT 10");
+ //       String sql = "SELECT * FROM FILM as f WHERE f.NAME LIKE '%up%'";
+
+
+        return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
+    }
+
+    @Override
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {
         String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
                 "FROM FILM AS f " +

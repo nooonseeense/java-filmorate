@@ -1,17 +1,25 @@
 package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.exception.IncorrectParameterException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.impl.FilmGenreStorage;
+import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.impl.LikeStorage;
+import ru.application.filmorate.impl.MpaStorage;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.impl.*;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static ru.application.filmorate.util.Constants.*;
+
 @Service
+@Slf4j
 @AllArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
@@ -41,6 +49,24 @@ public class FilmService {
         List<Film> popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count);
         filmGenreStorage.setGenres(popularMoviesByLikes);
         return popularMoviesByLikes;
+    }
+
+    public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
+        List<Film> resultPopularMoviesFromAdvancedSearch = null;
+        if (!SAMPLE.contains(by)) {
+            throw new IncorrectParameterException("Некорректное значение выборки");
+        }
+        if (query.equals(UNKNOWN) & by.equals(UNKNOWN)) {
+            resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesByLikes(10);
+            log.debug("Получен запрос на список из 10 популярных фильмов");
+        } else if (!query.equals(UNKNOWN) & by.equals(TITLE)) {
+            resultPopularMoviesFromAdvancedSearch  = filmStorage.getPopularMoviesFromAdvancedSearch(query);
+            log.debug("Получен запрос на список из 10 популярных фильмов где в названии используется {}", query);
+        }
+        //log.debug("Получен запрос на список из {} популярных фильмов", count);
+
+        filmGenreStorage.setGenres(resultPopularMoviesFromAdvancedSearch);
+        return resultPopularMoviesFromAdvancedSearch;
     }
 
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {
