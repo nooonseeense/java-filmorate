@@ -15,14 +15,12 @@ import java.util.List;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
-    
-    private final LikeStorage likeStorage;
+
 
     @Autowired
-    public UserService(UserStorage userStorage, FriendStorage friendStorage, LikeStorage likeStorage) {
+    public UserService(UserStorage userStorage, FriendStorage friendStorage) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
-        this.likeStorage = likeStorage;
     }
 
     public List<User> get() {
@@ -74,9 +72,6 @@ public class UserService {
     public void removeUserById(Integer id) {
         log.debug("Получен запрос на удаление пользователя по id = {}", id);
         userStorage.removeUserById(id);
-        //likeStorage.removeUserAndLikes(id);
-        //friendStorage.removeUserAndFriends(id);
-
     }
 
 }

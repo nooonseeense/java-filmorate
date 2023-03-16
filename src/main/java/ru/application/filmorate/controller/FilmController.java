@@ -54,4 +54,9 @@ public class FilmController {
                            @PositiveOrZero @PathVariable Integer userId) {
         filmService.removeLike(id, userId);
     }
+
+    @DeleteMapping("{filmId}")
+    public void removeFilmById(@PositiveOrZero @PathVariable Integer filmId) {
+        filmService.removeFilmById(filmId);
+    }
 }

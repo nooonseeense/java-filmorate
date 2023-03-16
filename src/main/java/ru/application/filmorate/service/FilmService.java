@@ -1,6 +1,7 @@
 package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
@@ -12,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
@@ -63,5 +65,15 @@ public class FilmService {
 
     public void removeLike(Integer id, Integer userId) {
         likeStorage.removeLike(id, userId);
+    }
+
+    /**
+     * Метод удаления фильма по ID
+     *
+     * @param id id фильма
+     */
+    public void removeFilmById(Integer id) {
+        log.debug("Получен запрос на удаление пользователя по id = {}", id);
+        filmStorage.removeFilmById(id);
     }
 }

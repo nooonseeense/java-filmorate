@@ -53,19 +53,5 @@ public class FriendDao implements FriendStorage {
                         "LEFT JOIN USERS AS U ON F.USER2_ID = U.ID " +
                         "WHERE USER1_ID = ?";
         return jdbcTemplate.query(sql, Mapper::userMapper, id);
-//        List<User> result = jdbcTemplate.query(sql, Mapper::userMapper, id);
-//        if (result.size() == 0) {
-//            String message = String.format("Пользователь с id = %d не найден в балице друзей", id);
-//            log.debug(message);
-//            throw new ObjectWasNotFoundException(message);
-//        }
-//        return result;
-    }
-
-    @Override
-    public void removeUserAndFriends(Integer id) {
-        String sql = "DELETE FROM FRIEND  " +
-                "WHERE USER1_ID = ? OR USER2_ID = ? ";
-        jdbcTemplate.update(sql, id);
     }
 }
