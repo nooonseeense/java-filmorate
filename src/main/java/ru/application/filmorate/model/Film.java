@@ -28,4 +28,5 @@ public class Film {
     @Min(value = 1, message = "Продолжительность фильма должна быть положительной.")
     private int duration;
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+    private LinkedHashSet<Director> directors = new LinkedHashSet<>();
 }
