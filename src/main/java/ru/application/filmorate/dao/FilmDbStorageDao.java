@@ -59,6 +59,21 @@ public class FilmDbStorageDao implements FilmStorage {
     }
 
     @Override
+    public List<Film> getCommonMovies(Integer userId, Integer friendId) {
+        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                "FROM FILM AS f " +
+                "LEFT JOIN LIKE_FILM AS lf ON f.ID = lf.FILM_ID " +
+                "LEFT JOIN MPA AS m ON m.ID = f.MPA " +
+                "WHERE f.ID IN (SELECT f.ID FROM FILM AS f " +
+                "LEFT JOIN LIKE_FILM AS lfu ON lfu.FILM_ID = f.ID " +
+                "LEFT JOIN LIKE_FILM AS lff ON lff.FILM_ID = f.ID " +
+                "WHERE lfu.USER_ID = ? AND lff.USER_ID = ?) " +
+                "GROUP BY f.ID " +
+                "ORDER BY COUNT(lf.FILM_ID) DESC";
+        return jdbcTemplate.query(sql, Mapper::filmMapper, userId, friendId);
+    }
+
+    @Override
     public Film add(Film film) {
         String sql = "INSERT INTO FILM (NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA) " +
                 "VALUES (?,?,?,?,?)";
