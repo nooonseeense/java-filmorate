@@ -8,8 +8,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.Film;
 import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
 
@@ -74,7 +74,7 @@ public class FilmDbStorageDao implements FilmStorage {
         if (by.equals(DIRECTOR)) {
             sql.append("WHERE LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
         }
-        if (by.equals(DIRECTOR_AND_TITLE) || by.equals(TITLE_AND_DIRECTOR)){
+        if (by.equals(DIRECTOR_AND_TITLE) || by.equals(TITLE_AND_DIRECTOR)) {
             sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') OR ");
             sql.append("LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
         }
@@ -82,7 +82,6 @@ public class FilmDbStorageDao implements FilmStorage {
                 "SELECT FILM_ID " +
                 "FROM LIKE_FILM) " +
                 "ORDER BY COUNT(lf.film_id) DESC");
-
         return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
     }
 

@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static ru.application.filmorate.util.Constants.*;
+import static ru.application.filmorate.util.Constants.SAMPLE;
 
 @Service
 @Slf4j
@@ -51,19 +51,20 @@ public class FilmService {
         return popularMoviesByLikes;
     }
 
+    /**
+     * Метод расширенного поиска списка фильмов по определённым параметрам
+     *
+     * @param query текст для поиска
+     * @param by    может принимать значения director (поиск по режиссёру), title (поиск по названию)
+     * @return Список фильмов
+     */
     public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
-        List<Film> resultPopularMoviesFromAdvancedSearch = null;
+        List<Film> resultPopularMoviesFromAdvancedSearch;
         if (!SAMPLE.contains(by)) {
-            throw new IncorrectParameterException("Некорректное значение выборки");
+            throw new IncorrectParameterException("Некорректное значение выборки поиска");
         }
-        if (query.equals(UNKNOWN) & by.equals(UNKNOWN)) {
-            resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesByLikes(10);
-            log.debug("Получен запрос на список из 10 популярных фильмов");
-
-        } else {
-            resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
-            log.debug("Получен запрос на исполнение функционального поиска искомой строкой {} в разделе {}", query, by);
-        }
+        log.debug("Получен запрос на расширенный поиск текста = {}, по табл. = {}", query, by);
+        resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
         filmGenreStorage.setGenres(resultPopularMoviesFromAdvancedSearch);
         return resultPopularMoviesFromAdvancedSearch;
     }
