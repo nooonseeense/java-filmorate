@@ -43,6 +43,12 @@ public class FilmService {
         return popularMoviesByLikes;
     }
 
+    public List<Film> getCommonMovies(Integer userId, Integer friendId) {
+        List<Film> commonMovies = filmStorage.getCommonMovies(userId, friendId);
+        filmGenreStorage.setGenres(commonMovies);
+        return commonMovies;
+    }
+
     public Film add(Film film) {
         mpaStorage.setMpa(film);
         Film newFilm = filmStorage.add(film);
