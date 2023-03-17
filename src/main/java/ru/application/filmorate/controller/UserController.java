@@ -1,6 +1,7 @@
 package ru.application.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import ru.application.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/users")
@@ -44,6 +46,7 @@ public class UserController {
 
     @GetMapping("{id}/recommendations")
     public List<Film> getRecommendations(@PathVariable Integer id) {
+        log.info("Получен список рекомендаций для пользователя с id = {}", id);
         return userService.getRecommendations(id);
     }
 

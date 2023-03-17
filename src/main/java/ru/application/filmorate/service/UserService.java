@@ -14,6 +14,7 @@ import ru.application.filmorate.impl.UserStorage;
 import ru.application.filmorate.util.Mapper;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,18 +46,12 @@ public class UserService {
         log.debug("Получение рекомендаций для пользователя с ID {}", userId);
         validation(userStorage.getById(userId));
 
-        // получаем список лайков юзера
         List<LikeFilm> userLikes = userStorage.getUserLikes(userId);
-
-        // получаем список других юзеров, которые лайкнули те же фильмы, что и наш юзер
         List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId, userLikes));
 
         if (matchingUserIds.isEmpty()) return new ArrayList<>();
 
-        // получаем список рекомендованных фильмов с помощью matchingUserIds
         List<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId, matchingUserIds);
-
-        // сортируем фильмы по кол-ву лайков
         recommendedFilms.sort((f1, f2) -> userStorage.countLikes(f2.getId(),
                 matchingUserIds) - userStorage.countLikes(f1.getId(), matchingUserIds));
 

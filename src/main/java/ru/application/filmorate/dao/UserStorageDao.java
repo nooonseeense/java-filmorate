@@ -110,6 +110,7 @@ public class UserStorageDao implements UserStorage {
     }
 
     public Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
+        log.debug("Получение списка пользователей, лайкнувших те же фильмы, что и пользователь с id = {}", userId);
         Set<Integer> matchingUserIds = new HashSet<>();
         String sql = "SELECT DISTINCT lf.USER_ID " +
                 "FROM LIKE_FILM lf " +
@@ -126,6 +127,7 @@ public class UserStorageDao implements UserStorage {
     }
 
     public Integer countLikes(Integer filmId, List<Integer> userIds) {
+        log.debug("Подсчет лайков фильма с id = {}", filmId);
         if (userIds == null || userIds.isEmpty()) {
             return 0;
         }

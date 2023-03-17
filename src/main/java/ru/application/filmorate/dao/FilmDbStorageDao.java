@@ -157,6 +157,7 @@ public class FilmDbStorageDao implements FilmStorage {
     }
 
     public List<Film> getRecommendedFilms(Integer userId, List<Integer> matchingUserIds) {
+        log.debug("Поиск рекомендованных фильмов для пользователя с id = {}", userId);
         String recommendedFilmsSql = "SELECT * " +
                 "FROM FILM AS f " +
                 "JOIN MPA AS m ON f.MPA = m.ID " +
