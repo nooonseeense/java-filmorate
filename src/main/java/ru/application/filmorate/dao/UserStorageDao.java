@@ -111,13 +111,15 @@ public class UserStorageDao implements UserStorage {
 
     public Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
         Set<Integer> matchingUserIds = new HashSet<>();
-        String sql = "SELECT USER_ID " +
-                "FROM LIKE_FILM " +
-                "WHERE FILM_ID = ? AND USER_ID <> ?";
+        String sql = "SELECT DISTINCT lf.USER_ID " +
+                "FROM LIKE_FILM lf " +
+                "WHERE lf.FILM_ID IN (SELECT lf2.FILM_ID " +
+                "FROM LIKE_FILM lf2 " +
+                "WHERE lf2.USER_ID = ?) AND lf.USER_ID <> ?";
 
-        for (LikeFilm like : userLikes) {
-            List<Integer> usersWhoLikedFilm = jdbcTemplate.queryForList(sql, Integer.class, like.getFilmId(), userId);
-            matchingUserIds.addAll(usersWhoLikedFilm);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, userId, userId);
+        for (Map<String, Object> row : rows) {
+            matchingUserIds.add((Integer) row.get("USER_ID"));
         }
 
         return matchingUserIds;
