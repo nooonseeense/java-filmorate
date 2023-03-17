@@ -109,7 +109,7 @@ public class UserStorageDao implements UserStorage {
         return jdbcTemplate.query(userLikesSql, Mapper::likeFilmMapper, userId);
     }
 
-    public List<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
+    public Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
         Set<Integer> matchingUserIds = new HashSet<>();
         String sql = "SELECT USER_ID " +
                 "FROM LIKE_FILM " +
@@ -120,7 +120,7 @@ public class UserStorageDao implements UserStorage {
             matchingUserIds.addAll(usersWhoLikedFilm);
         }
 
-        return new ArrayList<>(matchingUserIds);
+        return matchingUserIds;
     }
 
     public Integer countLikes(Integer filmId, List<Integer> userIds) {

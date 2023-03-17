@@ -4,6 +4,7 @@ import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserStorage {
     List<User> get();
@@ -16,7 +17,7 @@ public interface UserStorage {
 
     List<LikeFilm> getUserLikes(Integer userId);
 
-    List<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes);
+    Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes);
 
     Integer countLikes(Integer id, List<Integer> matchingUserIds);
 

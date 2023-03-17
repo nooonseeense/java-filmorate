@@ -11,6 +11,7 @@ import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
+import ru.application.filmorate.util.Mapper;
 
 import java.util.*;
 
@@ -45,9 +46,9 @@ public class UserService {
         validation(userStorage.getById(userId));
 
         List<LikeFilm> userLikes = userStorage.getUserLikes(userId);
-        List<Integer> matchingUserIds = userStorage.getMatchingUserIds(userId, userLikes);
+        List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId, userLikes));
 
-        if (matchingUserIds.isEmpty()) return Collections.emptyList();
+        if (matchingUserIds.isEmpty()) return new ArrayList<>();
 
         List<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId, matchingUserIds);
 
