@@ -11,7 +11,6 @@ import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.impl.FilmStorage;
-import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
 
@@ -158,13 +157,16 @@ public class FilmDbStorageDao implements FilmStorage {
 
     public List<Film> getRecommendedFilms(Integer userId, List<Integer> matchingUserIds) {
         log.debug("Поиск рекомендованных фильмов для пользователя с id = {}", userId);
-        String recommendedFilmsSql = "SELECT * " +
+
+        String sql = "SELECT * " +
                 "FROM FILM AS f " +
                 "JOIN MPA AS m ON f.MPA = m.ID " +
-                "WHERE f.ID NOT IN (SELECT FILM_ID FROM LIKE_FILM WHERE USER_ID = ?) " +
-                "AND f.ID IN (SELECT FILM_ID FROM LIKE_FILM WHERE USER_ID IN (?))";
+                "LEFT JOIN LIKE_FILM AS l ON l.FILM_ID = f.ID AND l.USER_ID = ? " +
+                "WHERE l.USER_ID IS NULL AND f.ID IN (SELECT FILM_ID " +
+                "FROM LIKE_FILM " +
+                "WHERE USER_ID IN (?))";
 
-        List<Film> recommendedFilms = jdbcTemplate.query(recommendedFilmsSql,
+        List<Film> recommendedFilms = jdbcTemplate.query(sql,
                 Mapper::filmMapper, userId, matchingUserIds.toArray(new Integer[0]));
         recommendedFilms.forEach(film -> film.getGenres().addAll(filmGenreStorage.get(film.getId())));
 
