@@ -12,4 +12,10 @@ public interface UserStorage {
     User create(User user);
 
     User update(User user);
+
+    /**
+     * Метод удаления пользователя по ID
+     * @param id id пользователя
+     */
+    void removeUserById(Integer id);
 }
