@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.impl.ReviewStorage;
@@ -12,8 +13,10 @@ import ru.application.filmorate.model.Review;
 import ru.application.filmorate.util.Mapper;
 
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -99,8 +102,6 @@ public class ReviewStorageDao implements ReviewStorage {
                 "VALUES (?, ?, ?)";
 
         jdbcTemplate.update(sql, reviewId, userId, true);
-
-        incrementReviewRating(reviewId);
     }
 
     @Override
@@ -108,9 +109,8 @@ public class ReviewStorageDao implements ReviewStorage {
         String sql = "INSERT INTO REVIEW_RATING (REVIEW_ID, USER_ID, IS_POSITIVE) " +
                 "VALUES (?, ?, ?)";
 
-        jdbcTemplate.update(sql, reviewId, userId, true);
+        jdbcTemplate.update(sql, reviewId, userId, false);
 
-        decrementReviewRating(reviewId);
     }
 
     @Override
@@ -118,7 +118,6 @@ public class ReviewStorageDao implements ReviewStorage {
         String sql = "DELETE FROM REVIEW_RATING WHERE REVIEW_ID = ? AND USER_ID = ?";
         jdbcTemplate.update(sql, reviewId, userId);
 
-        decrementReviewRating(reviewId);
     }
 
     @Override
@@ -126,18 +125,61 @@ public class ReviewStorageDao implements ReviewStorage {
         String sql = "DELETE FROM REVIEW_RATING WHERE REVIEW_ID = ? AND USER_ID = ?";
         jdbcTemplate.update(sql, reviewId, userId);
 
-        incrementReviewRating(reviewId);
     }
 
-    private void incrementReviewRating(Integer reviewId) {
-        String sql = "UPDATE REVIEW SET USEFUL = USEFUL + 1 " +
-                "WHERE ID = ?";
-        jdbcTemplate.update(sql, reviewId);
+    @Override
+    public Optional<Boolean> isRateLike(Integer reviewId, Integer userId) {
+        String sql = "SELECT IS_POSITIVE " +
+                "FROM REVIEW_RATING " +
+                "WHERE REVIEW_ID = ? AND USER_ID = ?";
+
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, reviewId, userId);
+        Optional<Boolean> isLike = Optional.empty();
+        while (sqlRowSet.next()) {
+            isLike = Optional.of(sqlRowSet.getBoolean("is_positive"));
+        }
+        return isLike;
     }
 
-    private void decrementReviewRating(Integer reviewId) {
-        String sql = "UPDATE REVIEW SET USEFUL = USEFUL - 1 " +
+    @Override
+    public void changeUserRate(Integer reviewId, Integer userId, boolean rate) {
+        String sql = "UPDATE REVIEW_RATING SET IS_POSITIVE = ? " +
+                "WHERE REVIEW_ID = ? AND USER_ID = ?";
+
+        jdbcTemplate.update(sql, rate, reviewId, userId);
+        log.debug("Изменено значение лайка/дизлайка");
+    }
+
+    @Override
+    public void recalculateUseful(Integer reviewId) {
+        int reviewUseful = getReviewUseful(reviewId);
+
+        String sql = "UPDATE REVIEW SET USEFUL = ? " +
                 "WHERE ID = ?";
-        jdbcTemplate.update(sql, reviewId);
+
+        jdbcTemplate.update(sql, reviewUseful, reviewId);
+        log.debug("Обновлена полезность отзыва ");
+    }
+
+    private int getReviewUseful(Integer reviewId) {
+        String sql = "SELECT * FROM REVIEW_RATING WHERE REVIEW_ID = ?";
+
+        List<Boolean> useful = new ArrayList<>();
+
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, reviewId);
+        while (sqlRowSet.next()) {
+            useful.add(sqlRowSet.getBoolean("IS_POSITIVE"));
+        }
+
+        int reviewUseful = 0;
+
+        for (Boolean like : useful) {
+            if (like) {
+                reviewUseful++;
+            } else {
+                reviewUseful--;
+            }
+        }
+        return reviewUseful;
     }
 }
