@@ -11,16 +11,16 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 public class User {
-    @PositiveOrZero
     private int id;
     @Email(message = "Электронная почта не может быть пустой и должна содержать символ @.")
     @NotBlank
     private final String email;
     @NotBlank(message = "Логин не может быть пустым или состоять из пробелов.")
-    @Pattern(regexp = "([^\\s]+)", message = "Логин не может содержать пробелы.")
+    @Pattern(regexp = "(\\S+)", message = "Логин не может содержать пробелы.")
     private final String login;
-    private String name;
     @NotNull
     @PastOrPresent(message = "Дата рождения не может быть в будущем.")
     private final LocalDate birthday;
+
+    private String name;
 }

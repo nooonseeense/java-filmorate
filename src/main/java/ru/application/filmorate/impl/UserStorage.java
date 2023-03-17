@@ -15,6 +15,7 @@ public interface UserStorage {
 
     /**
      * Метод удаления пользователя по ID
+     *
      * @param id id пользователя
      */
     void removeUserById(Integer id);

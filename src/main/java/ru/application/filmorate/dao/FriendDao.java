@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
+import ru.application.filmorate.model.User;
 import ru.application.filmorate.util.Mapper;
 
 import java.util.List;

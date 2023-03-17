@@ -7,13 +7,13 @@ import ru.application.filmorate.annotation.ValidDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.LinkedHashSet;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class Film {
-    @PositiveOrZero
+
     private int id;
     @NotBlank(message = "Название не может быть пустым.")
     private final String name;
