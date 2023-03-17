@@ -132,7 +132,6 @@ public class UserStorageDao implements UserStorage {
                 "FROM LIKE_FILM " +
                 "WHERE FILM_ID = ? AND " +
                 "USER_ID IN (?)";
-        Integer result = jdbcTemplate.queryForObject(sql, Integer.class, filmId, userIds.toArray());
-        return result != null ? result : 0;
+        return jdbcTemplate.queryForObject(sql, Integer.class, filmId, userIds.toArray());
     }
 }
