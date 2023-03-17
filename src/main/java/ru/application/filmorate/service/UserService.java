@@ -5,14 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
-import ru.application.filmorate.impl.LikeStorage;
 import ru.application.filmorate.impl.FilmStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
-import ru.application.filmorate.model.User;
 
 import java.util.*;
 
@@ -43,7 +41,7 @@ public class UserService {
     }
 
     public List<Film> getRecommendations(Integer userId) {
-        log.info("Получение рекоммендаций для пользователя с ID {}", userId);
+        log.debug("Получение рекомендаций для пользователя с ID {}", userId);
         validation(userStorage.getById(userId));
 
         List<LikeFilm> userLikes = userStorage.getUserLikes(userId);
