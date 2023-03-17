@@ -8,14 +8,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.impl.UserStorage;
+import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.impl.UserStorage;
 import ru.application.filmorate.util.Mapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -100,5 +100,39 @@ public class UserStorageDao implements UserStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
+    }
+
+    public List<LikeFilm> getUserLikes(Integer userId) {
+        String userLikesSql = "SELECT * " +
+                "FROM LIKE_FILM " +
+                "WHERE USER_ID = ?";
+        return jdbcTemplate.query(userLikesSql, Mapper::likeFilmMapper, userId);
+    }
+
+    public List<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
+        Set<Integer> matchingUserIds = new HashSet<>();
+        String sql = "SELECT USER_ID " +
+                "FROM LIKE_FILM " +
+                "WHERE FILM_ID = ? AND USER_ID <> ?";
+
+        for (LikeFilm like : userLikes) {
+            List<Integer> usersWhoLikedFilm = jdbcTemplate.queryForList(sql, Integer.class, like.getFilmId(), userId);
+            matchingUserIds.addAll(usersWhoLikedFilm);
+        }
+
+        return new ArrayList<>(matchingUserIds);
+    }
+
+    public Integer countLikes(Integer filmId, List<Integer> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return 0;
+        }
+
+        String sql = "SELECT COUNT(*) " +
+                "FROM LIKE_FILM " +
+                "WHERE FILM_ID = ? AND " +
+                "USER_ID IN (?)";
+        Integer result = jdbcTemplate.queryForObject(sql, Integer.class, filmId, userIds.toArray());
+        return result != null ? result : 0;
     }
 }

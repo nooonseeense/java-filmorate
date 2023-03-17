@@ -33,7 +33,7 @@ public class Mapper {
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         Mpa mpa = new Mpa(rs.getInt("mpa.id"), rs.getString("mpa.name"));
         int duration = rs.getInt("duration");
-        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>());
+        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
     public static Mpa mpaMapper(ResultSet rs, int row) throws SQLException {
@@ -46,6 +46,14 @@ public class Mapper {
         return Genre.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
+                .build();
+    }
+
+    public static LikeFilm likeFilmMapper(ResultSet rs, int rowNum) throws SQLException {
+        return LikeFilm.builder()
+                .id(rs.getInt("id"))
+                .filmId(rs.getInt("film_id"))
+                .userId(rs.getInt("user_id"))
                 .build();
     }
 

@@ -2,6 +2,7 @@ package ru.application.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import ru.application.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
 import ru.application.filmorate.model.Feed;
 import ru.application.filmorate.model.User;
@@ -39,6 +40,11 @@ public class UserController {
     @GetMapping("{id}/friends")
     public List<User> getListOfFriends(@PathVariable Integer id) {
         return userService.getListOfFriends(id);
+    }
+
+    @GetMapping("{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Integer id) {
+        return userService.getRecommendations(id);
     }
 
     @PostMapping

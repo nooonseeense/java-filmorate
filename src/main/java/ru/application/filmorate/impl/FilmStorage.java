@@ -21,6 +21,8 @@ public interface FilmStorage {
 
     void removeGenres(Film film);
 
+    List<Film> getRecommendedFilms(Integer userId, List<Integer> matchingUserIds);
+
     /**
      * Метод удаления фильма по ID
      *
