@@ -8,8 +8,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
 
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FilmDbStorageDao implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final FilmGenreStorage filmGenreStorage;
 
     @Override
     public List<Film> get() {
@@ -145,11 +148,26 @@ public class FilmDbStorageDao implements FilmStorage {
     @Override
     public void removeFilmById(Integer id) {
         String sql = "DELETE FROM FILM  " +
-                     "WHERE ID = ? ";
+                "WHERE ID = ? ";
         if (jdbcTemplate.update(sql, id) == 0) {
             String message = String.format("Фильм с id = %d не найден.", id);
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
+    }
+
+    public List<Film> getRecommendedFilms(Integer userId, List<Integer> matchingUserIds) {
+        log.debug("Поиск рекомендованных фильмов для пользователя с id = {}", userId);
+        String recommendedFilmsSql = "SELECT * " +
+                "FROM FILM AS f " +
+                "JOIN MPA AS m ON f.MPA = m.ID " +
+                "WHERE f.ID NOT IN (SELECT FILM_ID FROM LIKE_FILM WHERE USER_ID = ?) " +
+                "AND f.ID IN (SELECT FILM_ID FROM LIKE_FILM WHERE USER_ID IN (?))";
+
+        List<Film> recommendedFilms = jdbcTemplate.query(recommendedFilmsSql,
+                Mapper::filmMapper, userId, matchingUserIds.toArray(new Integer[0]));
+        recommendedFilms.forEach(film -> film.getGenres().addAll(filmGenreStorage.get(film.getId())));
+
+        return recommendedFilms;
     }
 }

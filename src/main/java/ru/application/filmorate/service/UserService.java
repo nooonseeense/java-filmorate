@@ -1,27 +1,29 @@
 package ru.application.filmorate.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.impl.LikeStorage;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
+import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.model.Film;
+import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
+import ru.application.filmorate.util.Mapper;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
-
-
-    @Autowired
-    public UserService(UserStorage userStorage, FriendStorage friendStorage) {
-        this.userStorage = userStorage;
-        this.friendStorage = friendStorage;
-    }
+    private final FilmStorage filmStorage;
+    private final FeedService feedService;
 
     public List<User> get() {
         return userStorage.get();
@@ -40,6 +42,22 @@ public class UserService {
         return friendStorage.getListOfFriends(id);
     }
 
+    public List<Film> getRecommendations(Integer userId) {
+        log.debug("Получение рекомендаций для пользователя с ID {}", userId);
+        validation(userStorage.getById(userId));
+
+        List<LikeFilm> userLikes = userStorage.getUserLikes(userId);
+        List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId, userLikes));
+
+        if (matchingUserIds.isEmpty()) return new ArrayList<>();
+
+        List<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId, matchingUserIds);
+        recommendedFilms.sort((f1, f2) -> userStorage.countLikes(f2.getId(),
+                matchingUserIds) - userStorage.countLikes(f1.getId(), matchingUserIds));
+
+        return recommendedFilms;
+    }
+
     public User create(User user) {
         validation(user);
         return userStorage.create(user);
@@ -52,10 +70,12 @@ public class UserService {
 
     public void addFriends(Integer id, Integer friendId) {
         friendStorage.addFriends(id, friendId);
+        feedService.createFeed(id, EventType.FRIEND, Operation.ADD, friendId);
     }
 
     public void removeFriends(Integer id, Integer friendId) {
         friendStorage.removeFriends(id, friendId);
+        feedService.createFeed(id, EventType.FRIEND, Operation.REMOVE, friendId);
     }
 
     private void validation(User user) {
@@ -73,7 +93,6 @@ public class UserService {
         log.debug("Получен запрос на удаление пользователя по id = {}", id);
         userStorage.removeUserById(id);
     }
-
 }
 
 
