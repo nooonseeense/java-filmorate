@@ -13,6 +13,7 @@ import ru.application.filmorate.impl.LikeStorage;
 import ru.application.filmorate.impl.MpaStorage;
 import ru.application.filmorate.model.Film;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,8 +46,19 @@ public class FilmService {
         }
     }
 
-    public List<Film> getPopularMoviesByLikes(Integer count) {
-        List<Film> popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count);
+    public List<Film> getPopularMoviesByLikes(Integer count, Integer genreId, Short year) {
+        List<Film> popularMoviesByLikes = new ArrayList<>();
+        if (genreId == null && year == null) {
+            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count);
+        }
+        if (genreId != null && year != null) {
+            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count, genreId, year);
+        } else if (genreId != null) {
+            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count, genreId);
+        } else if (year != null) {
+            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count, year);
+        }
+
         filmGenreStorage.setGenres(popularMoviesByLikes);
         return popularMoviesByLikes;
     }
