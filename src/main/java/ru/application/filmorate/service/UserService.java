@@ -7,7 +7,6 @@ import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.impl.FilmStorage;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
@@ -43,9 +42,7 @@ public class UserService {
     public List<Film> getRecommendations(Integer userId) {
         log.debug("Получение рекомендаций для пользователя с ID {}", userId);
         validation(userStorage.getById(userId));
-
-        List<LikeFilm> userLikes = userStorage.getUserLikes(userId);
-        List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId, userLikes));
+        List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId));
 
         if (matchingUserIds.isEmpty()) {
             return new ArrayList<>();

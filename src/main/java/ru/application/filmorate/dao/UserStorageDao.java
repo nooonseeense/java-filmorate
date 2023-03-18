@@ -8,7 +8,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.UserStorage;
 import ru.application.filmorate.util.Mapper;
@@ -102,27 +101,15 @@ public class UserStorageDao implements UserStorage {
         }
     }
 
-    public List<LikeFilm> getUserLikes(Integer userId) {
-        String userLikesSql = "SELECT * " +
-                "FROM LIKE_FILM " +
-                "WHERE USER_ID = ?";
-        return jdbcTemplate.query(userLikesSql, Mapper::likeFilmMapper, userId);
-    }
+    public Set<Integer> getMatchingUserIds(Integer userId) {
+        log.debug("Получение списка идентификаторов пользователей, " +
+                "лайкнувших те же фильмы, что и пользователь с id = {}", userId);
+        String sql = "SELECT DISTINCT lf2.USER_ID " +
+                "FROM LIKE_FILM lf1 " +
+                "JOIN LIKE_FILM lf2 ON lf1.FILM_ID = lf2.FILM_ID " +
+                "WHERE lf1.USER_ID = ? " +
+                "AND lf2.USER_ID <> ?";
 
-    public Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
-        log.debug("Получение списка пользователей, лайкнувших те же фильмы, что и пользователь с id = {}", userId);
-        Set<Integer> matchingUserIds = new HashSet<>();
-        String sql = "SELECT DISTINCT lf.USER_ID " +
-                "FROM LIKE_FILM lf " +
-                "WHERE lf.FILM_ID IN (SELECT lf2.FILM_ID " +
-                "FROM LIKE_FILM lf2 " +
-                "WHERE lf2.USER_ID = ?) AND lf.USER_ID <> ?";
-
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, userId, userId);
-        for (Map<String, Object> row : rows) {
-            matchingUserIds.add((Integer) row.get("USER_ID"));
-        }
-
-        return matchingUserIds;
+        return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, userId, userId));
     }
 }
