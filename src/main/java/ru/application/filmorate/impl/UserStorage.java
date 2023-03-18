@@ -10,6 +10,5 @@ public interface UserStorage {
     User getById(Integer userId);
     User create(User user);
     User update(User user);
-    Set<Integer> getMatchingUserIds(Integer userId);
     void removeUserById(Integer id);
 }

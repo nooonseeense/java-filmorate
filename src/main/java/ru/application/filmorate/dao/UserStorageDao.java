@@ -100,16 +100,4 @@ public class UserStorageDao implements UserStorage {
             throw new ObjectWasNotFoundException(message);
         }
     }
-
-    public Set<Integer> getMatchingUserIds(Integer userId) {
-        log.debug("Получение списка идентификаторов пользователей, " +
-                "лайкнувших те же фильмы, что и пользователь с id = {}", userId);
-        String sql = "SELECT DISTINCT lf2.USER_ID " +
-                "FROM LIKE_FILM lf1 " +
-                "JOIN LIKE_FILM lf2 ON lf1.FILM_ID = lf2.FILM_ID " +
-                "WHERE lf1.USER_ID = ? " +
-                "AND lf2.USER_ID <> ?";
-
-        return new HashSet<>(jdbcTemplate.queryForList(sql, Integer.class, userId, userId));
-    }
 }

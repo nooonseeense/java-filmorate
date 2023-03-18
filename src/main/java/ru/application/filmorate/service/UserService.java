@@ -42,13 +42,7 @@ public class UserService {
     public List<Film> getRecommendations(Integer userId) {
         log.debug("Получение рекомендаций для пользователя с ID {}", userId);
         validation(userStorage.getById(userId));
-        List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId));
-
-        if (matchingUserIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return filmStorage.getRecommendedFilms(userId, matchingUserIds);
+        return filmStorage.getRecommendedFilms(userId);
     }
 
     public User create(User user) {
