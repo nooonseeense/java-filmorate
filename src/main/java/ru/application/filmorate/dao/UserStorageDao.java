@@ -125,17 +125,4 @@ public class UserStorageDao implements UserStorage {
 
         return matchingUserIds;
     }
-
-    public Integer countLikes(Integer filmId, List<Integer> userIds) {
-        log.debug("Подсчет лайков фильма с id = {}", filmId);
-        if (userIds == null || userIds.isEmpty()) {
-            return 0;
-        }
-
-        String sql = "SELECT COUNT(*) " +
-                "FROM LIKE_FILM " +
-                "WHERE FILM_ID = ? AND " +
-                "USER_ID IN (?)";
-        return jdbcTemplate.queryForObject(sql, Integer.class, filmId, userIds.toArray());
-    }
 }

@@ -19,8 +19,6 @@ public interface UserStorage {
 
     Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes);
 
-    Integer countLikes(Integer id, List<Integer> matchingUserIds);
-
     /**
      * Метод удаления пользователя по ID
      *
