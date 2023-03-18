@@ -17,9 +17,7 @@ import ru.application.filmorate.util.Mapper;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -166,7 +164,7 @@ public class FilmDbStorageDao implements FilmStorage {
 
         List<Film> recommendedFilms = jdbcTemplate.query(sql,
                 Mapper::filmMapper, userId, matchingUserIds.toArray(new Integer[0]));
-        recommendedFilms.forEach(film -> film.getGenres().addAll(filmGenreStorage.get(film.getId())));
+        filmGenreStorage.setGenres(recommendedFilms);
 
         return recommendedFilms;
     }
