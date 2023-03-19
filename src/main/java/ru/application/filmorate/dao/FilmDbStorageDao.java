@@ -10,16 +10,13 @@ import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.impl.FilmStorage;
-import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -203,17 +200,21 @@ public class FilmDbStorageDao implements FilmStorage {
         }
     }
 
-    public List<Film> getRecommendedFilms(Integer userId, List<Integer> matchingUserIds) {
-        log.debug("Поиск рекомендованных фильмов для пользователя с id = {}", userId);
-        String recommendedFilmsSql = "SELECT * " +
-                "FROM FILM AS f " +
+    public List<Film> getRecommendedFilms(Integer userId) {
+        String sql = "SELECT f.ID, f.NAME, m.ID, m.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION " +
+                "FROM LIKE_FILM AS lf1 " +
+                "JOIN LIKE_FILM AS lf2 ON lf2.FILM_ID = lf1.FILM_ID AND lf1.USER_ID = ? " +
+                "JOIN LIKE_FILM AS lf3 ON lf3.USER_ID = lf2.USER_ID AND lf3.USER_ID <> ? " +
+                "AND lf3.FILM_ID NOT IN (SELECT FILM_ID " +
+                "FROM LIKE_FILM " +
+                "WHERE USER_ID = ?) " +
+                "JOIN FILM AS f ON f.ID = lf3.FILM_ID " +
                 "JOIN MPA AS m ON f.MPA = m.ID " +
-                "WHERE f.ID NOT IN (SELECT FILM_ID FROM LIKE_FILM WHERE USER_ID = ?) " +
-                "AND f.ID IN (SELECT FILM_ID FROM LIKE_FILM WHERE USER_ID IN (?))";
+                "GROUP BY lf3.FILM_ID, f.ID " +
+                "ORDER BY COUNT(*) DESC";
 
-        List<Film> recommendedFilms = jdbcTemplate.query(recommendedFilmsSql,
-                Mapper::filmMapper, userId, matchingUserIds.toArray(new Integer[0]));
-        recommendedFilms.forEach(film -> film.getGenres().addAll(filmGenreStorage.get(film.getId())));
+        List<Film> recommendedFilms = jdbcTemplate.query(sql, Mapper::filmMapper, userId, userId, userId);
+        filmGenreStorage.setGenres(recommendedFilms);
 
         return recommendedFilms;
     }

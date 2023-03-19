@@ -27,11 +27,11 @@ public class FeedStorageDao implements FeedStorage {
     public void addFeed(Feed feed) {
         String sql = "INSERT INTO FEED (TIMESTAMP,USER_ID,EVENT_TYPE,OPERATION,ENTITY_ID) " +
                 "VALUES (?,?,?,?,?)";
-        jdbcTemplate.update(sql
-                , feed.getTimestamp()
-                , feed.getUserId()
-                , feed.getEventType().toString()
-                , feed.getOperation().toString()
-                , feed.getEntityId());
+        jdbcTemplate.update(sql,
+                feed.getTimestamp(),
+                feed.getUserId(),
+                feed.getEventType().toString(),
+                feed.getOperation().toString(),
+                feed.getEntityId());
     }
 }
