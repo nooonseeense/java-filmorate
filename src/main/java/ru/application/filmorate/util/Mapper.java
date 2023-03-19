@@ -50,9 +50,9 @@ public class Mapper {
     }
 
     public static Director directorMapper(ResultSet rs, int row) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        return new Director(id, name);
+        return Director.builder().
+                id(rs.getInt("id")).
+                name(rs.getString("name")).build();
     }
 
     public static LikeFilm likeFilmMapper(ResultSet rs, int rowNum) throws SQLException {

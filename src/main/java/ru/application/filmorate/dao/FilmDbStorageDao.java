@@ -142,16 +142,19 @@ public class FilmDbStorageDao implements FilmStorage {
 
         removeGenres(film);
         removeDirectors(film);
+
         if (film.getGenres() != null) {
             addGenres(film);
         } else {
             film.setGenres(new LinkedHashSet<>());
         }
+
         if (film.getDirectors() != null) {
             addDirectors(film);
         } else {
-            film.setGenres(new LinkedHashSet<>());
+            film.setDirectors(new LinkedHashSet<>());
         }
+
         int newRows = jdbcTemplate.update(sql,
                 film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getMpa().getId(), film.getId());
@@ -160,6 +163,7 @@ public class FilmDbStorageDao implements FilmStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
+
         return film;
     }
 
