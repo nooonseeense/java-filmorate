@@ -1,8 +1,8 @@
 package ru.application.filmorate.util;
 
+import ru.application.filmorate.model.*;
 import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
-import ru.application.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,6 +47,12 @@ public class Mapper {
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
                 .build();
+    }
+
+    public static Director directorMapper(ResultSet rs, int row) throws SQLException {
+        return Director.builder().
+                id(rs.getInt("id")).
+                name(rs.getString("name")).build();
     }
 
     public static LikeFilm likeFilmMapper(ResultSet rs, int rowNum) throws SQLException {
