@@ -7,14 +7,11 @@ import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.impl.FilmStorage;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.FriendStorage;
 import ru.application.filmorate.impl.UserStorage;
-import ru.application.filmorate.util.Mapper;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,17 +42,7 @@ public class UserService {
     public List<Film> getRecommendations(Integer userId) {
         log.debug("Получение рекомендаций для пользователя с ID {}", userId);
         validation(userStorage.getById(userId));
-
-        List<LikeFilm> userLikes = userStorage.getUserLikes(userId);
-        List<Integer> matchingUserIds = new ArrayList<>(userStorage.getMatchingUserIds(userId, userLikes));
-
-        if (matchingUserIds.isEmpty()) return new ArrayList<>();
-
-        List<Film> recommendedFilms = filmStorage.getRecommendedFilms(userId, matchingUserIds);
-        recommendedFilms.sort((f1, f2) -> userStorage.countLikes(f2.getId(),
-                matchingUserIds) - userStorage.countLikes(f1.getId(), matchingUserIds));
-
-        return recommendedFilms;
+        return filmStorage.getRecommendedFilms(userId);
     }
 
     public User create(User user) {

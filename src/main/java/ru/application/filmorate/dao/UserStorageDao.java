@@ -8,7 +8,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.LikeFilm;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.impl.UserStorage;
 import ru.application.filmorate.util.Mapper;
@@ -100,42 +99,5 @@ public class UserStorageDao implements UserStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
-    }
-
-    public List<LikeFilm> getUserLikes(Integer userId) {
-        String userLikesSql = "SELECT * " +
-                "FROM LIKE_FILM " +
-                "WHERE USER_ID = ?";
-        return jdbcTemplate.query(userLikesSql, Mapper::likeFilmMapper, userId);
-    }
-
-    public Set<Integer> getMatchingUserIds(Integer userId, List<LikeFilm> userLikes) {
-        log.debug("Получение списка пользователей, лайкнувших те же фильмы, что и пользователь с id = {}", userId);
-        Set<Integer> matchingUserIds = new HashSet<>();
-        String sql = "SELECT DISTINCT lf.USER_ID " +
-                "FROM LIKE_FILM lf " +
-                "WHERE lf.FILM_ID IN (SELECT lf2.FILM_ID " +
-                "FROM LIKE_FILM lf2 " +
-                "WHERE lf2.USER_ID = ?) AND lf.USER_ID <> ?";
-
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, userId, userId);
-        for (Map<String, Object> row : rows) {
-            matchingUserIds.add((Integer) row.get("USER_ID"));
-        }
-
-        return matchingUserIds;
-    }
-
-    public Integer countLikes(Integer filmId, List<Integer> userIds) {
-        log.debug("Подсчет лайков фильма с id = {}", filmId);
-        if (userIds == null || userIds.isEmpty()) {
-            return 0;
-        }
-
-        String sql = "SELECT COUNT(*) " +
-                "FROM LIKE_FILM " +
-                "WHERE FILM_ID = ? AND " +
-                "USER_ID IN (?)";
-        return jdbcTemplate.queryForObject(sql, Integer.class, filmId, userIds.toArray());
     }
 }
