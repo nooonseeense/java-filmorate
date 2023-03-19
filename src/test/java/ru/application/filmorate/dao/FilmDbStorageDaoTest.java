@@ -149,7 +149,7 @@ public class FilmDbStorageDaoTest {
                 .mpa(new Mpa(1, "G"))
                 .build();
 
-        Film actualFilm = filmController.getPopularMoviesByLikes(1).get(0);
+        Film actualFilm = filmController.getPopularMoviesByLikes(1,null,null).get(0);
 
         assertEquals(filmExpected.getId(), actualFilm.getId());
         assertEquals(filmExpected.getName(), actualFilm.getName());
