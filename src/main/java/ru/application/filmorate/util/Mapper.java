@@ -1,9 +1,6 @@
 package ru.application.filmorate.util;
 
-import ru.application.filmorate.model.Film;
-import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.model.Mpa;
-import ru.application.filmorate.model.User;
+import ru.application.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,7 +31,7 @@ public class Mapper {
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         Mpa mpa = new Mpa(rs.getInt("mpa.id"), rs.getString("mpa.name"));
         int duration = rs.getInt("duration");
-        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>());
+        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
     public static Mpa mpaMapper(ResultSet rs, int row) throws SQLException {
@@ -48,5 +45,11 @@ public class Mapper {
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
                 .build();
+    }
+
+    public static Director directorMapper(ResultSet rs, int row) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        return new Director(id, name);
     }
 }
