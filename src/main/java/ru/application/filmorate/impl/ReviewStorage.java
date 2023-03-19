@@ -27,9 +27,9 @@ public interface ReviewStorage {
 
     void deleteDislike(Integer reviewId, Integer userId);
 
-    Optional<Boolean> isRateLike(Integer reviewId, Integer userId);
+    Optional<Boolean> isLike(Integer reviewId, Integer userId);
 
-    void changeUserRate(Integer reviewId, Integer userId, boolean rate);
+    void changeUserLike(Integer reviewId, Integer userId, boolean rate);
 
     void recalculateUseful(Integer reviewId);
 }

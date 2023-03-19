@@ -38,8 +38,7 @@ public class ReviewService {
         try {
             return reviewStorage.getById(reviewId);
         } catch (EmptyResultDataAccessException e) {
-            String message = String.format("Отзыв с идентификатором %d не найден.", reviewId);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectWasNotFoundException(String.format("Отзыв с идентификатором %d не найден.", reviewId));
         }
     }
 
@@ -65,14 +64,14 @@ public class ReviewService {
 
     public void addLike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        Optional<Boolean> isLike = reviewStorage.isRateLike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
 
         if (isLike.isPresent()) {
             if (isLike.get()) {
-                throw new ReviewValidationException(String.format("Review with id %s already have like " +
-                        "from user with id %s.", reviewId, userId));
+                throw new ReviewValidationException(String.format("У отзыва с id: %s уже есть лайк " +
+                        "от пользователя с id: %s.", reviewId, userId));
             } else {
-                reviewStorage.changeUserRate(reviewId, userId, true);
+                reviewStorage.changeUserLike(reviewId, userId, true);
             }
         } else {
             reviewStorage.addLike(reviewId, userId);
@@ -82,14 +81,14 @@ public class ReviewService {
 
     public void addDislike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        Optional<Boolean> isLike = reviewStorage.isRateLike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
 
         if (isLike.isPresent()) {
             if (!isLike.get()) {
-                throw new ReviewValidationException(String.format("Review with id %s already have dislike " +
-                        "from user with id %s.", reviewId, userId));
+                throw new ReviewValidationException(String.format("У отзыва с id: %s уже есть дизлайк " +
+                        "от пользователя с id: %s.", reviewId, userId));
             } else {
-                reviewStorage.changeUserRate(reviewId, userId, false);
+                reviewStorage.changeUserLike(reviewId, userId, false);
             }
         } else {
             reviewStorage.addDislike(reviewId, userId);
@@ -99,11 +98,11 @@ public class ReviewService {
 
     public void deleteLike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        Optional<Boolean> isLike = reviewStorage.isRateLike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
 
         if (isLike.isEmpty()) {
-            throw new ReviewValidationException(String.format("Review with id %s don't have like " +
-                    "from user with id %s.", reviewId, userId));
+            throw new ReviewValidationException(String.format("У отзыва с id: %s нет лайка " +
+                    "от пользователя с id: %s.", reviewId, userId));
         } else if (isLike.get()) {
             reviewStorage.deleteLike(reviewId, userId);
             reviewStorage.recalculateUseful(reviewId);
@@ -113,11 +112,11 @@ public class ReviewService {
     public void deleteDislike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
 
-        Optional<Boolean> isLike = reviewStorage.isRateLike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
 
         if (isLike.isEmpty()) {
-            throw new ReviewValidationException(String.format("Review with id %s don't have dislike " +
-                    "from user with id %s.", reviewId, userId));
+            throw new ReviewValidationException(String.format("У отзыва с id: %s нет дизлайка " +
+                    "от пользователя с id: %s.", reviewId, userId));
         } else if (!isLike.get()) {
             reviewStorage.deleteDislike(reviewId, userId);
             reviewStorage.recalculateUseful(reviewId);

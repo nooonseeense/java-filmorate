@@ -66,9 +66,7 @@ public class ReviewStorageDao implements ReviewStorage {
                 review.getReviewId());
 
         if (newRows == 0) {
-            String message = String.format("Отзыв с ID = %d не найден.", review.getReviewId());
-            log.debug(message);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectWasNotFoundException(String.format("Отзыв с ID = %d не найден.", review.getReviewId()));
         }
         return getById(review.getReviewId());
     }
@@ -110,25 +108,31 @@ public class ReviewStorageDao implements ReviewStorage {
                 "VALUES (?, ?, ?)";
 
         jdbcTemplate.update(sql, reviewId, userId, false);
-
     }
 
     @Override
     public void deleteLike(Integer reviewId, Integer userId) {
         String sql = "DELETE FROM REVIEW_RATING WHERE REVIEW_ID = ? AND USER_ID = ?";
-        jdbcTemplate.update(sql, reviewId, userId);
 
+        jdbcTemplate.update(sql, reviewId, userId);
     }
 
     @Override
     public void deleteDislike(Integer reviewId, Integer userId) {
         String sql = "DELETE FROM REVIEW_RATING WHERE REVIEW_ID = ? AND USER_ID = ?";
-        jdbcTemplate.update(sql, reviewId, userId);
 
+        jdbcTemplate.update(sql, reviewId, userId);
     }
 
+    /**
+     *
+     * @param reviewId ID отзыва
+     * @param userId ID пользователя
+     * @return TRUE - пользователь поставил лайк, FALSE - пользователь поставил дизлайк,
+     * EMPTY - пользователь не ставил лайк/дизлайк.
+     */
     @Override
-    public Optional<Boolean> isRateLike(Integer reviewId, Integer userId) {
+    public Optional<Boolean> isLike(Integer reviewId, Integer userId) {
         String sql = "SELECT IS_POSITIVE " +
                 "FROM REVIEW_RATING " +
                 "WHERE REVIEW_ID = ? AND USER_ID = ?";
@@ -142,12 +146,11 @@ public class ReviewStorageDao implements ReviewStorage {
     }
 
     @Override
-    public void changeUserRate(Integer reviewId, Integer userId, boolean rate) {
+    public void changeUserLike(Integer reviewId, Integer userId, boolean like) {
         String sql = "UPDATE REVIEW_RATING SET IS_POSITIVE = ? " +
                 "WHERE REVIEW_ID = ? AND USER_ID = ?";
 
-        jdbcTemplate.update(sql, rate, reviewId, userId);
-        log.debug("Изменено значение лайка/дизлайка");
+        jdbcTemplate.update(sql, like, reviewId, userId);
     }
 
     @Override
@@ -158,7 +161,6 @@ public class ReviewStorageDao implements ReviewStorage {
                 "WHERE ID = ?";
 
         jdbcTemplate.update(sql, reviewUseful, reviewId);
-        log.debug("Обновлена полезность отзыва ");
     }
 
     private int getReviewUseful(Integer reviewId) {
@@ -168,18 +170,9 @@ public class ReviewStorageDao implements ReviewStorage {
 
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, reviewId);
         while (sqlRowSet.next()) {
-            useful.add(sqlRowSet.getBoolean("IS_POSITIVE"));
+            useful.add(sqlRowSet.getBoolean("is_positive"));
         }
 
-        int reviewUseful = 0;
-
-        for (Boolean like : useful) {
-            if (like) {
-                reviewUseful++;
-            } else {
-                reviewUseful--;
-            }
-        }
-        return reviewUseful;
+        return Math.toIntExact(useful.stream().filter(p -> p).count() - useful.stream().filter(p -> !p).count());
     }
 }
