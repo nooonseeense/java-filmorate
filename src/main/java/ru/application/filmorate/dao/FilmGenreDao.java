@@ -8,9 +8,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.util.Mapper;
 
 import java.util.List;

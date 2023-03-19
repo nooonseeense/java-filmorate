@@ -6,8 +6,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
-import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.impl.GenreStorage;
+import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
 
 import java.util.List;

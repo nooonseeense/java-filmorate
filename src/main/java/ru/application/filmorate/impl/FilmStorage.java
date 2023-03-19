@@ -27,4 +27,8 @@ public interface FilmStorage {
     void removeGenres(Film film);
 
     void removeDirectors(Film film);
+
+    List<Film> getRecommendedFilms(Integer userId);
+
+    void removeFilmById(Integer id);
 }

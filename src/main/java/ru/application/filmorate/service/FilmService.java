@@ -4,8 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Director;
+import ru.application.filmorate.impl.FilmGenreStorage;
+import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.impl.LikeStorage;
+import ru.application.filmorate.impl.MpaStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.impl.*;
 import ru.application.filmorate.model.enums.FilmSort;
@@ -24,6 +30,7 @@ public class FilmService {
     private final FilmGenreStorage filmGenreStorage;
     private final DirectorStorage directorStorage;
     private final MpaStorage mpaStorage;
+    private final FeedService feedService;
 
     public List<Film> get() {
         List<Film> films = filmStorage.get();
@@ -91,9 +98,21 @@ public class FilmService {
 
     public void addLike(Integer id, Integer userId) {
         likeStorage.addLike(id, userId);
+        feedService.createFeed(userId, EventType.LIKE, Operation.ADD, id);
     }
 
     public void removeLike(Integer id, Integer userId) {
         likeStorage.removeLike(id, userId);
+        feedService.createFeed(userId, EventType.LIKE, Operation.REMOVE, id);
+    }
+
+    /**
+     * Метод удаления фильма по ID
+     *
+     * @param id id фильма
+     */
+    public void removeFilmById(Integer id) {
+        log.debug("Получен запрос на удаление пользователя по id = {}", id);
+        filmStorage.removeFilmById(id);
     }
 }
