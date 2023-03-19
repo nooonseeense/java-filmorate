@@ -12,7 +12,7 @@ import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.impl.FilmStorage;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.util.Mapper;
-
+import ru.application.filmorate.model.Film;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
