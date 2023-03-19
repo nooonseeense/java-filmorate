@@ -89,4 +89,15 @@ public class UserStorageDao implements UserStorage {
             return user;
         }
     }
+
+    @Override
+    public void removeUserById(Integer id) {
+        String sql = "DELETE FROM USERS  " +
+                "WHERE ID = ? ";
+        if (jdbcTemplate.update(sql, id) == 0) {
+            String message = String.format("Пользователь с id = %d не найден.", id);
+            log.debug(message);
+            throw new ObjectWasNotFoundException(message);
+        }
+    }
 }

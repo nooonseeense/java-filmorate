@@ -1,9 +1,11 @@
 package ru.application.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import ru.application.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
+import ru.application.filmorate.model.Film;
+import ru.application.filmorate.model.enums.FilmSort;
 import ru.application.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import static ru.application.filmorate.util.Constants.UNKNOWN;
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Slf4j
 public class FilmController {
     private final FilmService filmService;
 
@@ -47,6 +50,13 @@ public class FilmController {
         return filmService.getCommonMovies(userId, friendId);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getBy(@PathVariable int directorId,
+                            @RequestParam FilmSort sortBy) {
+        log.info("Получен запрос на получение списка фильмов режиссера id={}, sortBy={}.", directorId, sortBy);
+        return filmService.getBy(directorId, sortBy);
+    }
+
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
         return filmService.add(film);
@@ -67,5 +77,10 @@ public class FilmController {
     public void removeLike(@PositiveOrZero @PathVariable Integer id,
                            @PositiveOrZero @PathVariable Integer userId) {
         filmService.removeLike(id, userId);
+    }
+
+    @DeleteMapping("{filmId}")
+    public void removeFilmById(@PositiveOrZero @PathVariable Integer filmId) {
+        filmService.removeFilmById(filmId);
     }
 }
