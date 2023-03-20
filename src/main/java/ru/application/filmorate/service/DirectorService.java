@@ -3,7 +3,7 @@ package ru.application.filmorate.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.impl.DirectorStorage;
+import ru.application.filmorate.storage.director.DirectorStorage;
 import ru.application.filmorate.model.Director;
 
 import java.util.List;

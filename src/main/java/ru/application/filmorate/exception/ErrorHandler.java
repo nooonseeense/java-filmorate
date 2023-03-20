@@ -41,7 +41,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleIncorrectParameterException(final IncorrectParameterException e) {
         log.warn(e.getMessage());
-        return Map.of("error", e.getMessage());
+        return Map.of(ERROR, e.getMessage());
     }
 
     @ExceptionHandler

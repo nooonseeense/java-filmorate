@@ -3,13 +3,13 @@ package ru.application.filmorate.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.enums.EventType;
-import ru.application.filmorate.enums.Operation;
-import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.util.enumeration.EventType;
+import ru.application.filmorate.util.enumeration.Operation;
+import ru.application.filmorate.storage.film.FilmStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.impl.FriendStorage;
-import ru.application.filmorate.impl.UserStorage;
+import ru.application.filmorate.storage.friend.FriendStorage;
+import ru.application.filmorate.storage.user.UserStorage;
 
 import java.util.*;
 
@@ -20,7 +20,7 @@ public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
     private final FilmStorage filmStorage;
-    private final FeedService feedService;
+    private final EventService eventService;
 
     public List<User> get() {
         return userStorage.get();
@@ -57,12 +57,12 @@ public class UserService {
 
     public void addFriends(Integer id, Integer friendId) {
         friendStorage.addFriends(id, friendId);
-        feedService.createFeed(id, EventType.FRIEND, Operation.ADD, friendId);
+        eventService.createEvent(id, EventType.FRIEND, Operation.ADD, friendId);
     }
 
     public void removeFriends(Integer id, Integer friendId) {
         friendStorage.removeFriends(id, friendId);
-        feedService.createFeed(id, EventType.FRIEND, Operation.REMOVE, friendId);
+        eventService.createEvent(id, EventType.FRIEND, Operation.REMOVE, friendId);
     }
 
     private void validation(User user) {

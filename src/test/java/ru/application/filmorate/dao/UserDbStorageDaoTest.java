@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.storage.user.UserStorageDao;
 
 import java.time.LocalDate;
 import java.util.List;
