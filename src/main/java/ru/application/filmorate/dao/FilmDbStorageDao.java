@@ -15,7 +15,7 @@ import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.model.enums.FilmSort;
 import ru.application.filmorate.util.Mapper;
-
+import ru.application.filmorate.model.Film;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -90,6 +90,52 @@ public class FilmDbStorageDao implements FilmStorage {
         return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
     }
 
+    public List<Film> getPopularMoviesByLikes(Integer count, Integer genreId, Short year) {
+        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                "FROM FILM as f " +
+                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                "LEFT JOIN MPA m on m.ID = f.MPA " +
+                "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
+                "WHERE fg.GENRE_ID = ? AND " +
+                "YEAR(f.RELEASE_DATE) = ? " +
+                "GROUP BY f.ID, lf.FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM LIKE_FILM) " +
+                "ORDER BY COUNT(lf.film_id) DESC " +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, Mapper::filmMapper, genreId, year, count);
+    }
+
+    @Override
+    public List<Film> getPopularMoviesByLikes(Integer count, Integer genreId) {
+        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                "FROM FILM as f " +
+                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                "LEFT JOIN MPA m on m.ID = f.MPA " +
+                "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
+                "WHERE fg.GENRE_ID = ? " +
+                "GROUP BY f.ID, lf.FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM LIKE_FILM) " +
+                "ORDER BY COUNT(lf.film_id) DESC " +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, Mapper::filmMapper, genreId, count);
+    }
+
+    @Override
+    public List<Film> getPopularMoviesByLikes(Integer count, Short year) {
+        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                "FROM FILM as f " +
+                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                "LEFT JOIN MPA m on m.ID = f.MPA " +
+                "WHERE YEAR(f.RELEASE_DATE) = ? " +
+                "GROUP BY f.ID, lf.FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM LIKE_FILM) " +
+                "ORDER BY COUNT(lf.film_id) DESC " +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, Mapper::filmMapper, year, count);
+    }
 
     @Override
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {

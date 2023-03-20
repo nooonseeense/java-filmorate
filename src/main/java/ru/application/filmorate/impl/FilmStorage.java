@@ -20,6 +20,12 @@ public interface FilmStorage {
      * @return Список фильмов
      */
     List<Film> getPopularMoviesFromAdvancedSearch(String query, String by);
+    
+    List<Film> getPopularMoviesByLikes(Integer count,Integer genreId);
+    
+    List<Film> getPopularMoviesByLikes(Integer count,Short year);
+    
+    List<Film> getPopularMoviesByLikes(Integer count,Integer genreId,Short year);
 
     List<Film> getCommonMovies(Integer userId, Integer friendId);
 
