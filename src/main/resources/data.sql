@@ -13,13 +13,6 @@ VALUES (1, 'G'),
        (4, 'R'),
        (5, 'NC-17');
 
---INSERT INTO DIRECTOR(id, name)
---VALUES (1, 'Director updated');
---INSERT INTO FILM(id, name, DESCRIPTION, RELEASE_DATE, DURATION, MPA)
---VALUES (3, 'New film with director', 'Film with director', '1999-04-30', 120, 3);
-
---INSERT INTO FILM_DIRECTOR(id, film_id, director_id)
---VALUES (1, 3, 1);
 
 
 
