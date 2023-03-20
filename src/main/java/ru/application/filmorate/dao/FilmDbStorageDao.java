@@ -8,9 +8,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.Director;
 import ru.application.filmorate.impl.FilmGenreStorage;
 import ru.application.filmorate.impl.FilmStorage;
+import ru.application.filmorate.model.Director;
+import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
 import ru.application.filmorate.model.enums.FilmSort;
 import ru.application.filmorate.util.Mapper;
@@ -23,6 +24,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static ru.application.filmorate.util.Constants.*;
 
 @Component
 @RequiredArgsConstructor
@@ -63,6 +66,30 @@ public class FilmDbStorageDao implements FilmStorage {
     }
 
     @Override
+    public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
+        StringBuilder sql = new StringBuilder("SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                "FROM FILM as f " +
+                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                "LEFT JOIN MPA m on m.ID = f.MPA " +
+                "LEFT JOIN FILM_DIRECTOR fd on f.ID = fd.FILM_ID " +
+                "LEFT JOIN DIRECTOR d on fd.DIRECTOR_ID = d.ID ");
+        if (by.equals(TITLE)) {
+            sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals(DIRECTOR)) {
+            sql.append("WHERE LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
+        }
+        if (by.equals(DIRECTOR_AND_TITLE) || by.equals(TITLE_AND_DIRECTOR)) {
+            sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') OR ");
+            sql.append("LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
+        }
+        sql.append("GROUP BY f.ID, lf.FILM_ID IN ( " +
+                "SELECT FILM_ID " +
+                "FROM LIKE_FILM) " +
+                "ORDER BY COUNT(lf.film_id) DESC");
+        return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
+    }
+
     public List<Film> getPopularMoviesByLikes(Integer count, Integer genreId, Short year) {
         String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
                 "FROM FILM as f " +
@@ -210,7 +237,6 @@ public class FilmDbStorageDao implements FilmStorage {
             log.debug(message);
             throw new ObjectWasNotFoundException(message);
         }
-
         return film;
     }
 

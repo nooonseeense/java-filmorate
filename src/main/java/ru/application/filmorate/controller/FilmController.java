@@ -13,6 +13,8 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+import static ru.application.filmorate.util.Constants.UNKNOWN;
+
 @Validated
 @RestController
 @RequestMapping("/films")
@@ -36,6 +38,13 @@ public class FilmController {
                                               @RequestParam(required = false) Integer genreId,
                                               @RequestParam(required = false) Short year) {
             return filmService.getPopularMoviesByLikes(count,genreId,year);
+    }
+
+    @GetMapping("/search")
+    public List<Film> getPopularMoviesFromAdvancedSearch(
+                                @RequestParam(value = "query", defaultValue = UNKNOWN) String query,
+                                @RequestParam(value = "by", defaultValue = UNKNOWN) String by) {
+        return filmService.getPopularMoviesFromAdvancedSearch(query, by);
     }
 
     @GetMapping("/common")

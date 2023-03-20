@@ -38,6 +38,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleIncorrectParameterException(final IncorrectParameterException e) {
+        log.warn(e.getMessage());
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFoundEx(final ObjectWasNotFoundException e) {
         log.warn("Текст исключения: Объект не был найден.");

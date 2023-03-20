@@ -6,14 +6,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
+import ru.application.filmorate.exception.IncorrectParameterException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.model.Director;
-import ru.application.filmorate.impl.FilmGenreStorage;
-import ru.application.filmorate.impl.FilmStorage;
-import ru.application.filmorate.impl.LikeStorage;
-import ru.application.filmorate.impl.MpaStorage;
-import ru.application.filmorate.model.Film;
 import ru.application.filmorate.impl.*;
+import ru.application.filmorate.model.Director;
+import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.enums.FilmSort;
 
 import java.util.ArrayList;
@@ -21,6 +18,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+
+import static ru.application.filmorate.util.Constants.SAMPLE;
 
 @Service
 @AllArgsConstructor
@@ -70,6 +69,25 @@ public class FilmService {
         filmGenreStorage.setGenres(popularMoviesByLikes);
         directorStorage.setDirectors(popularMoviesByLikes);
         return popularMoviesByLikes;
+    }
+
+    /**
+     * Метод расширенного поиска списка фильмов по определённым параметрам
+     *
+     * @param query текст для поиска
+     * @param by    может принимать значения director (поиск по режиссёру), title (поиск по названию)
+     * @return Список фильмов
+     */
+    public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
+        List<Film> resultPopularMoviesFromAdvancedSearch;
+        if (!SAMPLE.contains(by)) {
+            throw new IncorrectParameterException("Некорректное значение выборки поиска");
+        }
+        log.debug("Получен запрос на расширенный поиск текста = {}, по табл. = {}", query, by);
+        resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
+        filmGenreStorage.setGenres(resultPopularMoviesFromAdvancedSearch);
+        directorStorage.setDirectors(resultPopularMoviesFromAdvancedSearch);
+        return resultPopularMoviesFromAdvancedSearch;
     }
 
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {
