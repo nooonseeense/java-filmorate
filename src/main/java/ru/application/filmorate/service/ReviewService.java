@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.exception.ReviewValidationException;
 import ru.application.filmorate.impl.ReviewStorage;
@@ -20,18 +22,23 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
+    private final FeedService feedService;
     private final FilmService filmService;
     private final UserService userService;
 
 
     public Review add(Review review) {
         validateReview(review);
-        return reviewStorage.add(review);
+        Review addedReview = reviewStorage.add(review);
+        feedService.createFeed(addedReview.getUserId(), EventType.REVIEW, Operation.ADD, addedReview.getReviewId());
+        return addedReview;
     }
 
     public Review update(Review review) {
         validateReview(review);
-        return reviewStorage.update(review);
+        Review updatedReview = reviewStorage.update(review);
+        feedService.createFeed(updatedReview.getUserId(), EventType.REVIEW, Operation.UPDATE, updatedReview.getReviewId());
+        return updatedReview;
     }
 
     public Review getById(Integer reviewId) {
@@ -45,6 +52,7 @@ public class ReviewService {
     public void delete(Integer reviewId) {
         getById(reviewId);
         reviewStorage.delete(reviewId);
+        feedService.createFeed(deletedReview.getUserId(), EventType.REVIEW, Operation.REMOVE, deletedReview.getReviewId());
     }
 
     public List<Review> getAllByFilm(Integer filmId, Integer count) {

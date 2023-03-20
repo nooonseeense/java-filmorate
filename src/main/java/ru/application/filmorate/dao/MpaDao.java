@@ -6,9 +6,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectDoesNotExist;
+import ru.application.filmorate.impl.MpaStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Mpa;
-import ru.application.filmorate.impl.MpaStorage;
 import ru.application.filmorate.util.Mapper;
 
 import java.util.List;
@@ -45,6 +45,8 @@ public class MpaDao implements MpaStorage {
     public void setMpa(Film film) {
         Mpa mpa = jdbcTemplate.queryForObject("SELECT ID, NAME FROM MPA WHERE ID = ?",
                 Mapper::mpaMapper, film.getMpa().getId());
-        film.setMpa(mpa);
+        if (mpa != null) {
+            film.setMpa(mpa);
+        }
     }
 }

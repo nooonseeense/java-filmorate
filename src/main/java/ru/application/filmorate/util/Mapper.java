@@ -1,11 +1,13 @@
 package ru.application.filmorate.util;
 
 import ru.application.filmorate.model.*;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.LinkedHashSet;
 
 public class Mapper {
 
@@ -31,7 +33,7 @@ public class Mapper {
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         Mpa mpa = new Mpa(rs.getInt("mpa.id"), rs.getString("mpa.name"));
         int duration = rs.getInt("duration");
-        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>());
+        return new Film(id, name, description, releaseDate, mpa, duration, new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
     public static Mpa mpaMapper(ResultSet rs, int row) throws SQLException {
@@ -47,6 +49,20 @@ public class Mapper {
                 .build();
     }
 
+    public static Director directorMapper(ResultSet rs, int row) throws SQLException {
+        return Director.builder().
+                id(rs.getInt("id")).
+                name(rs.getString("name")).build();
+    }
+
+    public static LikeFilm likeFilmMapper(ResultSet rs, int rowNum) throws SQLException {
+        return LikeFilm.builder()
+                .id(rs.getInt("id"))
+                .filmId(rs.getInt("film_id"))
+                .userId(rs.getInt("user_id"))
+                .build();
+    }
+
     public static Review reviewMapper(ResultSet rs, int row) throws SQLException {
         return Review.builder()
                 .reviewId(rs.getInt("id"))
@@ -55,6 +71,17 @@ public class Mapper {
                 .userId(rs.getInt("user_id"))
                 .filmId(rs.getInt("film_id"))
                 .useful(rs.getInt("useful"))
+                .build();
+    }
+
+    public static Feed feedMapper(ResultSet rs, int row) throws SQLException {
+        return Feed.builder()
+                .eventId(rs.getInt("event_id"))
+                .timestamp(rs.getTimestamp("timestamp"))
+                .userId(rs.getInt("user_id"))
+                .eventType(EventType.valueOf(rs.getString("event_type")))
+                .operation(Operation.valueOf(rs.getString("operation")))
+                .entityId(rs.getInt("entity_id"))
                 .build();
     }
 }
