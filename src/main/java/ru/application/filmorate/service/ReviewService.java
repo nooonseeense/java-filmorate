@@ -2,16 +2,18 @@ package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.enums.EventType;
 import ru.application.filmorate.enums.Operation;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ReviewValidationException;
 import ru.application.filmorate.impl.ReviewStorage;
 import ru.application.filmorate.model.Review;
-import ru.application.filmorate.model.User;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,18 +42,14 @@ public class ReviewService {
     }
 
     public Review getById(Integer reviewId) {
-        if (reviewNotExists(reviewId)) {
-            log.debug("Отзыв с id {} не найден.", reviewId);
-            throw new ObjectWasNotFoundException(String.format("Отзыв с id %d не найден.", reviewId));
+        try {
+            return reviewStorage.getById(reviewId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ObjectWasNotFoundException(String.format("Отзыв с идентификатором %d не найден.", reviewId));
         }
-        return reviewStorage.getById(reviewId);
     }
 
     public void delete(Integer reviewId) {
-        if (reviewNotExists(reviewId)) {
-            log.debug("Отзыв с id {} не найден.", reviewId);
-            throw new ObjectWasNotFoundException(String.format("Отзыв с id %d не найден.", reviewId));
-        }
         Review deletedReview = getById(reviewId);
         reviewStorage.delete(reviewId);
         feedService.createFeed(deletedReview.getUserId(), EventType.REVIEW, Operation.REMOVE, deletedReview.getReviewId());
@@ -74,22 +72,63 @@ public class ReviewService {
 
     public void addLike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        reviewStorage.addLike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
+
+        if (isLike.isPresent()) {
+            if (isLike.get()) {
+                throw new ReviewValidationException(String.format("У отзыва с id: %s уже есть лайк " +
+                        "от пользователя с id: %s.", reviewId, userId));
+            } else {
+                reviewStorage.changeUserLike(reviewId, userId, true);
+            }
+        } else {
+            reviewStorage.addLike(reviewId, userId);
+        }
+        reviewStorage.recalculateUseful(reviewId);
     }
 
     public void addDislike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        reviewStorage.addDislike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
+
+        if (isLike.isPresent()) {
+            if (!isLike.get()) {
+                throw new ReviewValidationException(String.format("У отзыва с id: %s уже есть дизлайк " +
+                        "от пользователя с id: %s.", reviewId, userId));
+            } else {
+                reviewStorage.changeUserLike(reviewId, userId, false);
+            }
+        } else {
+            reviewStorage.addDislike(reviewId, userId);
+        }
+        reviewStorage.recalculateUseful(reviewId);
     }
 
     public void deleteLike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        reviewStorage.deleteLike(reviewId, userId);
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
+
+        if (isLike.isEmpty()) {
+            throw new ReviewValidationException(String.format("У отзыва с id: %s нет лайка " +
+                    "от пользователя с id: %s.", reviewId, userId));
+        } else if (isLike.get()) {
+            reviewStorage.deleteLike(reviewId, userId);
+            reviewStorage.recalculateUseful(reviewId);
+        }
     }
 
     public void deleteDislike(Integer reviewId, Integer userId) {
         validateReviewAndUser(reviewId, userId);
-        reviewStorage.deleteDislike(reviewId, userId);
+
+        Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
+
+        if (isLike.isEmpty()) {
+            throw new ReviewValidationException(String.format("У отзыва с id: %s нет дизлайка " +
+                    "от пользователя с id: %s.", reviewId, userId));
+        } else if (!isLike.get()) {
+            reviewStorage.deleteDislike(reviewId, userId);
+            reviewStorage.recalculateUseful(reviewId);
+        }
     }
 
     private void validateReview(Review review) {
@@ -98,34 +137,7 @@ public class ReviewService {
     }
 
     private void validateReviewAndUser(Integer reviewId, Integer userId) {
-        if (reviewNotExists(reviewId)) {
-            log.debug("Отзыв с id {} не найден.", reviewId);
-            throw new ObjectWasNotFoundException(String.format("Отзыв с id %d не найден.", reviewId));
-        }
-        if (userNotExists(userId)) {
-            log.debug("Пользователь с id {} не найден.", userId);
-            throw new ObjectWasNotFoundException(String.format("Пользователь с id %d не найден.", userId));
-        }
-
-    }
-
-    public boolean reviewNotExists(int reviewId) {
-        List<Review> reviews = reviewStorage.getAll();
-        for (Review review : reviews) {
-            if (review.getReviewId() == reviewId) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean userNotExists(int userId) {
-        List<User> users = userService.get();
-        for (User user : users) {
-            if (user.getId() == userId) {
-                return false;
-            }
-        }
-        return true;
+        getById(reviewId);
+        userService.getById(userId);
     }
 }

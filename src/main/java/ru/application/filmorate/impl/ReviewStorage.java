@@ -3,6 +3,7 @@ package ru.application.filmorate.impl;
 import ru.application.filmorate.model.Review;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewStorage {
 
@@ -25,4 +26,10 @@ public interface ReviewStorage {
     void deleteLike(Integer reviewId, Integer userId);
 
     void deleteDislike(Integer reviewId, Integer userId);
+
+    Optional<Boolean> isLike(Integer reviewId, Integer userId);
+
+    void changeUserLike(Integer reviewId, Integer userId, boolean rate);
+
+    void recalculateUseful(Integer reviewId);
 }
