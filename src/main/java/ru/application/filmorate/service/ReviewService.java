@@ -50,7 +50,7 @@ public class ReviewService {
     }
 
     public void delete(Integer reviewId) {
-        getById(reviewId);
+        Review deletedReview = getById(reviewId);
         reviewStorage.delete(reviewId);
         feedService.createFeed(deletedReview.getUserId(), EventType.REVIEW, Operation.REMOVE, deletedReview.getReviewId());
     }
