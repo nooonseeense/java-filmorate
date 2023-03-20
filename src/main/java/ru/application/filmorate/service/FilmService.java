@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.enums.EventType;
+import ru.application.filmorate.enums.Operation;
+import ru.application.filmorate.exception.IncorrectParameterException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.impl.*;
 import ru.application.filmorate.model.Director;
-import ru.application.filmorate.impl.FilmGenreStorage;
-import ru.application.filmorate.impl.FilmStorage;
-import ru.application.filmorate.impl.LikeStorage;
-import ru.application.filmorate.impl.MpaStorage;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.enums.FilmSort;
 
@@ -74,6 +74,7 @@ public class FilmService {
         log.debug("Получен запрос на расширенный поиск текста = {}, по табл. = {}", query, by);
         resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
         filmGenreStorage.setGenres(resultPopularMoviesFromAdvancedSearch);
+        directorStorage.setDirectors(resultPopularMoviesFromAdvancedSearch);
         return resultPopularMoviesFromAdvancedSearch;
     }
 
