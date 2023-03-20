@@ -25,11 +25,13 @@ public class FilmController {
 
     @GetMapping
     public List<Film> get() {
+        log.info("Запрос GET: get() на получение списка всех фильмов.");
         return filmService.get();
     }
 
     @GetMapping("{filmId}")
     public Film getById(@PositiveOrZero @PathVariable Integer filmId) {
+        log.info("Запрос GET: getById() на получение фильма по ID.");
         return filmService.getById(filmId);
     }
 
@@ -49,40 +51,46 @@ public class FilmController {
 
     @GetMapping("/common")
     public List<Film> getCommonMovies(@RequestParam Integer userId, @RequestParam Integer friendId) {
+        log.info("Запрос GET: getCommonMovies() на получение списка общих фильмов юзеров {} и {}.", userId, friendId);
         return filmService.getCommonMovies(userId, friendId);
     }
 
     @GetMapping("/director/{directorId}")
     public List<Film> getBy(@PathVariable int directorId,
                             @RequestParam FilmSort sortBy) {
-        log.info("Получен запрос на получение списка фильмов режиссера id={}, sortBy={}.", directorId, sortBy);
+        log.info("Запрос GET: getBy() на получение списка фильмов режиссера id={}, sortBy={}.", directorId, sortBy);
         return filmService.getBy(directorId, sortBy);
     }
 
     @PostMapping
     public Film add(@Valid @RequestBody Film film) {
+        log.info("Запрос POST: add() на добавление фильма.");
         return filmService.add(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
+        log.info("Запрос PUT: update() на обновление фильма.");
         return filmService.update(film);
     }
 
     @PutMapping("{id}/like/{userId}")
     public void addLike(@PositiveOrZero @PathVariable Integer id,
                         @PositiveOrZero @PathVariable Integer userId) {
+        log.info("Запрос PUT: addLike() на добавление лайка к фильму {} от юзера {}.", id, userId);
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("{id}/like/{userId}")
     public void removeLike(@PositiveOrZero @PathVariable Integer id,
                            @PositiveOrZero @PathVariable Integer userId) {
+        log.info("Запрос DELETE: removeLike() на удаление лайка от юзера {} из фильма {}.", userId, id);
         filmService.removeLike(id, userId);
     }
 
     @DeleteMapping("{filmId}")
     public void removeFilmById(@PositiveOrZero @PathVariable Integer filmId) {
+        log.info("Запрос DELETE: removeFilmById() на удаление фильма {}.", filmId);
         filmService.removeFilmById(filmId);
     }
 }
