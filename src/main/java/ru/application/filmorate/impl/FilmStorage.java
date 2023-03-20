@@ -12,6 +12,12 @@ public interface FilmStorage {
 
     List<Film> getPopularMoviesByLikes(Integer count);
 
+    List<Film> getPopularMoviesByLikes(Integer count,Integer genreId);
+    
+    List<Film> getPopularMoviesByLikes(Integer count,Short year);
+    
+    List<Film> getPopularMoviesByLikes(Integer count,Integer genreId,Short year);
+
     List<Film> getCommonMovies(Integer userId, Integer friendId);
 
     List<Film> getBy(int directorId, FilmSort sortBy);
