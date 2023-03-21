@@ -8,12 +8,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
-import ru.application.filmorate.storage.filmgenre.FilmGenreStorage;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
-import ru.application.filmorate.util.enumeration.FilmSort;
+import ru.application.filmorate.storage.filmgenre.FilmGenreStorage;
 import ru.application.filmorate.util.Mapper;
+import ru.application.filmorate.util.enumeration.FilmSort;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 
 import static ru.application.filmorate.util.Constants.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class FilmStorageDao implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmGenreStorage filmGenreStorage;
@@ -157,24 +157,24 @@ public class FilmStorageDao implements FilmStorage {
             case year:
                 return jdbcTemplate.query(
                         "SELECT * " +
-                        "FROM FILM AS f " +
-                        "LEFT JOIN MPA AS m ON f.mpa = m.id " +
-                        "LEFT JOIN FILM_DIRECTOR AS fd ON f.id = fd.film_id " +
-                        "LEFT JOIN DIRECTOR AS d ON fd.director_id = d.id " +
-                        "WHERE d.id = ? " +
-                        "GROUP BY f.id " +
-                        "ORDER BY f.RELEASE_DATE", Mapper::filmMapper, directorId);
+                                "FROM FILM AS f " +
+                                "LEFT JOIN MPA AS m ON f.mpa = m.id " +
+                                "LEFT JOIN FILM_DIRECTOR AS fd ON f.id = fd.film_id " +
+                                "LEFT JOIN DIRECTOR AS d ON fd.director_id = d.id " +
+                                "WHERE d.id = ? " +
+                                "GROUP BY f.id " +
+                                "ORDER BY f.RELEASE_DATE", Mapper::filmMapper, directorId);
             case likes:
                 return jdbcTemplate.query(
                         "SELECT * " +
-                        "FROM FILM AS f " +
-                        "LEFT JOIN LIKE_FILM AS lf ON f.id = lf.film_id " +
-                        "LEFT JOIN MPA AS m ON f.mpa = m.id " +
-                        "LEFT JOIN FILM_DIRECTOR AS fd ON f.id = fd.film_id " +
-                        "LEFT JOIN DIRECTOR AS d ON fd.director_id = d.id " +
-                        "WHERE d.id = ? " +
-                        "GROUP BY f.id " +
-                        "ORDER BY COUNT(lf.FILM_ID) DESC", Mapper::filmMapper, directorId);
+                                "FROM FILM AS f " +
+                                "LEFT JOIN LIKE_FILM AS lf ON f.id = lf.film_id " +
+                                "LEFT JOIN MPA AS m ON f.mpa = m.id " +
+                                "LEFT JOIN FILM_DIRECTOR AS fd ON f.id = fd.film_id " +
+                                "LEFT JOIN DIRECTOR AS d ON fd.director_id = d.id " +
+                                "WHERE d.id = ? " +
+                                "GROUP BY f.id " +
+                                "ORDER BY COUNT(lf.FILM_ID) DESC", Mapper::filmMapper, directorId);
             default:
                 return new ArrayList<>();
         }
@@ -233,7 +233,7 @@ public class FilmStorageDao implements FilmStorage {
                 film.getDuration(), film.getMpa().getId(), film.getId());
         if (newRows == 0) {
             String message = String.format("Фильм с ID = %d не найден.", film.getId());
-            log.debug(message);
+            log.debug("FilmStorageDao update(Film film): Фильм с ID = {} не найден.", film.getId());
             throw new ObjectWasNotFoundException(message);
         }
         return film;
@@ -299,7 +299,7 @@ public class FilmStorageDao implements FilmStorage {
                 "WHERE ID = ? ";
         if (jdbcTemplate.update(sql, id) == 0) {
             String message = String.format("Фильм с id = %d не найден.", id);
-            log.debug(message);
+            log.debug("FilmStorageDao update(Film film): Фильм с ID = {} не найден.", id);
             throw new ObjectWasNotFoundException(message);
         }
     }

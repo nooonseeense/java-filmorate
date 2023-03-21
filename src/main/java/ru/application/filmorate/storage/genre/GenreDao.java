@@ -34,7 +34,7 @@ public class GenreDao implements GenreStorage {
             return genre;
         } catch (EmptyResultDataAccessException e) {
             String message = "Жанр с id = " + id + " не найден.";
-            log.debug(message);
+            log.debug("GenreDao getById(int id): Жанр с id = {} не найден.", id);
             throw new ObjectDoesNotExist(message);
         }
     }

@@ -10,9 +10,9 @@ import ru.application.filmorate.util.Mapper;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class FriendDao implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -20,10 +20,12 @@ public class FriendDao implements FriendStorage {
         String sql = "INSERT INTO FRIEND(USER1_ID, USER2_ID) VALUES (?, ?)";
         try {
             jdbcTemplate.update(sql, id, friendId);
-            log.info("Пользователь с id = {} и id = {} стали друзьями.", id, friendId);
+            log.info("FriendDao addFriends(Integer id, Integer friendId): Пользователь с id = {} и id = {} стали друзьями.",
+                    id, friendId);
         } catch (ObjectWasNotFoundException e) {
             String message = String.format("Пользователь с id = %d или id = %d не найден.", id, friendId);
-            log.debug(message);
+            log.debug("FriendDao addFriends(Integer id, Integer friendId): Пользователь с id = {} или id = {} не найден.",
+                    id, friendId);
             throw new ObjectWasNotFoundException(message);
         }
     }

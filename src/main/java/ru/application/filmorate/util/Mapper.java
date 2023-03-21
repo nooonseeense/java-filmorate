@@ -55,7 +55,7 @@ public class Mapper {
                 name(rs.getString("name")).build();
     }
 
-    public static LikeFilm likeFilmMapper(ResultSet rs, int rowNum) throws SQLException {
+    public static LikeFilm likeFilmMapper(ResultSet rs, int row) throws SQLException {
         return LikeFilm.builder()
                 .id(rs.getInt("id"))
                 .filmId(rs.getInt("film_id"))

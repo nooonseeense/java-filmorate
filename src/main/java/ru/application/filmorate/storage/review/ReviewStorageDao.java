@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class ReviewStorageDao implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -65,6 +65,7 @@ public class ReviewStorageDao implements ReviewStorage {
                 review.getReviewId());
 
         if (newRows == 0) {
+            log.debug("ReviewStorageDao update(Review review): Отзыв с ID = {} не найден.", review.getReviewId());
             throw new ObjectWasNotFoundException(String.format("Отзыв с ID = %d не найден.", review.getReviewId()));
         }
         return getById(review.getReviewId());
@@ -123,13 +124,6 @@ public class ReviewStorageDao implements ReviewStorage {
         jdbcTemplate.update(sql, reviewId, userId);
     }
 
-    /**
-     *
-     * @param reviewId ID отзыва
-     * @param userId ID пользователя
-     * @return TRUE - пользователь поставил лайк, FALSE - пользователь поставил дизлайк,
-     * EMPTY - пользователь не ставил лайк/дизлайк.
-     */
     @Override
     public Optional<Boolean> isLike(Integer reviewId, Integer userId) {
         String sql = "SELECT IS_POSITIVE " +
@@ -154,7 +148,7 @@ public class ReviewStorageDao implements ReviewStorage {
 
     @Override
     public void recalculateUseful(Integer reviewId) {
-        int reviewUseful = getReviewUseful(reviewId);
+        Integer reviewUseful = getReviewUseful(reviewId);
 
         String sql = "UPDATE REVIEW SET USEFUL = ? " +
                 "WHERE ID = ?";
@@ -162,7 +156,12 @@ public class ReviewStorageDao implements ReviewStorage {
         jdbcTemplate.update(sql, reviewUseful, reviewId);
     }
 
-    private int getReviewUseful(Integer reviewId) {
+    /**
+     * Метод *** НАПИСАТЬ ТУТ ОПИСАНИЕ МОЙ МОЗГ НЕ МОЖЕТ***
+     * @param reviewId
+     * @return
+     */
+    private Integer getReviewUseful(Integer reviewId) {
         String sql = "SELECT * FROM REVIEW_RATING WHERE REVIEW_ID = ?";
 
         List<Boolean> useful = new ArrayList<>();

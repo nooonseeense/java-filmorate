@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
+import static ru.application.filmorate.util.Constants.*;
 import java.util.Map;
 
+/**
+ * Класс обработки ошибок
+ */
 @Slf4j
 @RestControllerAdvice(basePackages = "ru.application.filmorate.controller")
 public class ErrorHandler {
-
-    private static final String ERROR = "error";
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -40,7 +42,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleIncorrectParameterException(final IncorrectParameterException e) {
-        log.warn(e.getMessage());
+        log.warn("Текст исключения: Некорректные параметры ввода.");
         return Map.of(ERROR, e.getMessage());
     }
 

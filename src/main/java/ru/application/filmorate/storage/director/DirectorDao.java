@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
@@ -24,9 +23,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DirectorDao implements DirectorStorage {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
@@ -37,7 +36,7 @@ public class DirectorDao implements DirectorStorage {
     }
 
     @Override
-    public Optional<Director> get(int id) {
+    public Optional<Director> get(Integer id) {
         String sql = "SELECT * FROM DIRECTOR WHERE ID = ?";
         SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, id);
         if (!rs.next()) {
@@ -67,7 +66,7 @@ public class DirectorDao implements DirectorStorage {
         int newRows = jdbcTemplate.update(sql, director.getName(), director.getId());
         if (newRows == 0) {
             String message = "Директор " + director + " не найден.";
-            log.debug(message);
+            log.debug("DirectorDao update(Director director): Режиссёр {} не найден.", director);
             throw new ObjectWasNotFoundException(message);
         }
         return director;
@@ -79,7 +78,7 @@ public class DirectorDao implements DirectorStorage {
         int result = jdbcTemplate.update(sql, id);
         if (result == 0) {
             String message = "Режиссер с id = " + id + " не найден.";
-            log.debug(message);
+            log.debug("DirectorDao delete(int id): Режиссер с id = {} не найден.", id);
             throw new ObjectWasNotFoundException(message);
         }
     }
@@ -89,9 +88,9 @@ public class DirectorDao implements DirectorStorage {
         if (films != null) {
             String sqlDirectors =
                     "SELECT FILM_ID, d.* " +
-                    "FROM FILM_DIRECTOR " +
-                    "JOIN DIRECTOR AS d ON d.ID = FILM_DIRECTOR.DIRECTOR_ID " +
-                    "WHERE FILM_DIRECTOR.FILM_ID IN (:filmsId)";
+                            "FROM FILM_DIRECTOR " +
+                            "JOIN DIRECTOR AS d ON d.ID = FILM_DIRECTOR.DIRECTOR_ID " +
+                            "WHERE FILM_DIRECTOR.FILM_ID IN (:filmsId)";
 
             List<Integer> filmsId = films.stream().map(Film::getId).collect(Collectors.toList());
             Map<Integer, Film> filmsMap = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
