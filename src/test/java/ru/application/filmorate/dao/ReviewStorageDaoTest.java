@@ -13,6 +13,9 @@ import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Mpa;
 import ru.application.filmorate.model.Review;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.storage.film.FilmStorageDao;
+import ru.application.filmorate.storage.review.ReviewStorageDao;
+import ru.application.filmorate.storage.user.UserStorageDao;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ReviewStorageDaoTest {
 
-    private final FilmDbStorageDao filmStorage;
+    private final FilmStorageDao filmStorage;
     private final UserStorageDao userStorage;
     private final ReviewStorageDao reviewStorage;
 

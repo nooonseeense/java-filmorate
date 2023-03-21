@@ -3,11 +3,11 @@ package ru.application.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
+import ru.application.filmorate.model.Event;
 import ru.application.filmorate.model.Film;
 import org.springframework.web.bind.annotation.*;
-import ru.application.filmorate.model.Feed;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.service.FeedService;
+import ru.application.filmorate.service.EventService;
 import ru.application.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final FeedService feedService;
+    private final EventService eventService;
 
     @GetMapping
     public List<User> get() {
@@ -78,7 +78,7 @@ public class UserController {
     }
 
     @GetMapping("{id}/feed")
-    public List<Feed> getUserFeed(@PathVariable Integer id) {
-        return feedService.getFeedByUserId(id);
+    public List<Event> getUserEvent(@PathVariable Integer id) {
+        return eventService.getEventByUserId(id);
     }
 }

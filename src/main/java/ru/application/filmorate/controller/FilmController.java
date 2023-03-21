@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.model.enums.FilmSort;
+import ru.application.filmorate.util.enumeration.FilmSort;
 import ru.application.filmorate.service.FilmService;
 
 import javax.validation.Valid;

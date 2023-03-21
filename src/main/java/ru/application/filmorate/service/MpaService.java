@@ -2,7 +2,7 @@ package ru.application.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.dao.MpaDao;
+import ru.application.filmorate.storage.mpa.MpaDao;
 import ru.application.filmorate.model.Mpa;
 
 import java.util.List;
