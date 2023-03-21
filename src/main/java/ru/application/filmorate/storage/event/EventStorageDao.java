@@ -11,7 +11,6 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class EventStorageDao implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;

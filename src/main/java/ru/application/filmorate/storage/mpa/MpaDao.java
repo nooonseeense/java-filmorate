@@ -35,7 +35,7 @@ public class MpaDao implements MpaStorage {
             return mpa;
         } catch (EmptyResultDataAccessException e) {
             String message = String.format("MPA-рейтинг с id = %d не найден.", id);
-            log.debug(message);
+            log.debug("MpaDao getById(int id): MPA-рейтинг с id = {} не найден.", id);
             throw new ObjectDoesNotExist(message);
         }
     }

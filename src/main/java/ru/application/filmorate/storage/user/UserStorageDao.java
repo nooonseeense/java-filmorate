@@ -13,11 +13,12 @@ import ru.application.filmorate.util.Mapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class UserStorageDao implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -41,7 +42,7 @@ public class UserStorageDao implements UserStorage {
             return user;
         } catch (EmptyResultDataAccessException e) {
             String message = String.format("Пользователь с id = %d не найден.", userId);
-            log.debug(message);
+            log.debug("UserStorageDao getById(Integer userId): Пользователь с id = {} не найден.", userId);
             throw new ObjectWasNotFoundException(message);
         }
     }
@@ -82,7 +83,7 @@ public class UserStorageDao implements UserStorage {
         );
         if (updateRows == 0) {
             String message = String.format("Пользователь с идентификатором %d не найден.", user.getId());
-            log.debug(message);
+            log.debug("UserStorageDao update(User user): Пользователь с идентификатором {} не найден.", user.getId());
             throw new ObjectWasNotFoundException(message);
         } else {
             return user;
@@ -95,7 +96,7 @@ public class UserStorageDao implements UserStorage {
                 "WHERE ID = ? ";
         if (jdbcTemplate.update(sql, id) == 0) {
             String message = String.format("Пользователь с id = %d не найден.", id);
-            log.debug(message);
+            log.debug("UserStorageDao removeUserById(Integer id): Пользователь с id = {} не найден.", id);
             throw new ObjectWasNotFoundException(message);
         }
     }
