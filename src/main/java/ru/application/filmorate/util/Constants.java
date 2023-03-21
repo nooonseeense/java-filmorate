@@ -6,6 +6,7 @@ import java.util.Set;
  * Класс констант
  */
 public class Constants {
+    public static final String ERROR = "error";
     public static final String UNKNOWN = "unknown";
     public static final String DIRECTOR = "director";
     public static final String TITLE = "title";

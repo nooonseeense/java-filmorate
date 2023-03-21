@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class LikeDao implements LikeStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -19,7 +19,8 @@ public class LikeDao implements LikeStorage {
             jdbcTemplate.update(sql, id, userId);
         } catch (ObjectWasNotFoundException e) {
             String message = String.format("Фильм с id = %d или пользователь с id = %d не найден.", id, userId);
-            log.debug(message);
+            log.debug("LikeDao addLike(int id, int userId): Фильм с id = {} или пользователь с id = {} не найден.",
+                    id, userId);
             throw new ObjectWasNotFoundException(message);
         }
     }
@@ -32,7 +33,8 @@ public class LikeDao implements LikeStorage {
             jdbcTemplate.update(sql, id, userId);
         } catch (ObjectWasNotFoundException e) {
             String message = String.format("Фильм с id = %d или Пользователь с id = %d не найден.", id, userId);
-            log.debug(message);
+            log.debug("LikeDao removeLike(int id, int userId): Фильм с id = {} или пользователь с id = {} не найден.",
+                    id, userId);
             throw new ObjectWasNotFoundException(message);
         }
     }

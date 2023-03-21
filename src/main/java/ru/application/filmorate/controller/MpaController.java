@@ -1,6 +1,7 @@
 package ru.application.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import ru.application.filmorate.service.MpaService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
@@ -18,11 +20,13 @@ public class MpaController {
 
     @GetMapping
     public List<Mpa> get() {
+        log.info("Запрос GET: get() на получение списка всех MPA.");
         return mpaService.get();
     }
 
     @GetMapping("/{id}")
-    public Mpa getById(@PathVariable int id) {
+    public Mpa getById(@PathVariable Integer id) {
+        log.info("Запрос GET: getById(Integer id) на получение MPA по ID = {}.", id);
         return mpaService.getById(id);
     }
 }
