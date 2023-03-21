@@ -157,7 +157,7 @@ public class ReviewStorageDao implements ReviewStorage {
     }
 
     /**
-     * Метод **НАПИСАТЬ ТУТ ОПИСАНИЕ МОЙ МОЗГ НЕ МОЖЕТ***
+     * Метод *** НАПИСАТЬ ТУТ ОПИСАНИЕ МОЙ МОЗГ НЕ МОЖЕТ***
      * @param reviewId
      * @return
      */
