@@ -149,7 +149,7 @@ public class ReviewDao implements ReviewStorage {
     /**
      * Метод получения полезности отзыва
      * @param reviewId id отзыва
-     * @return useful значение
+     * @return расчитывает текущую полезность отзыва
      */
     private Integer getReviewUseful(Integer reviewId) {
         String sql = "SELECT * FROM REVIEW_RATING WHERE REVIEW_ID = ?";
