@@ -12,7 +12,6 @@ import javax.validation.constraints.PositiveOrZero;
 @Builder
 @AllArgsConstructor
 public class Review {
-
     @PositiveOrZero
     private int reviewId;
     @NotBlank

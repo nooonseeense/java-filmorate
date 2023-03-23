@@ -30,9 +30,9 @@ public class UserController {
     }
 
     @GetMapping("{userId}")
-    public User getById(@PositiveOrZero @PathVariable Integer userId) {
-        log.info("Запрос GET: getById(Integer userId) на получение пользователя по ID = {}.", userId);
-        return userService.getById(userId);
+    public User get(@PositiveOrZero @PathVariable Integer userId) {
+        log.info("Запрос GET: get(Integer userId) на получение пользователя по ID = {}.", userId);
+        return userService.get(userId);
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
@@ -85,14 +85,14 @@ public class UserController {
     }
 
     @DeleteMapping("{userId}")
-    public void removeUserById(@PositiveOrZero @PathVariable Integer userId) {
-        log.info("Запрос DELETE: removeUserById(Integer userId) на удаление пользователя с ID = {}.", userId);
-        userService.removeUserById(userId);
+    public void remove(@PositiveOrZero @PathVariable Integer userId) {
+        log.info("Запрос DELETE: remove(Integer userId) на удаление пользователя с ID = {}.", userId);
+        userService.remove(userId);
     }
 
     @GetMapping("{id}/feed")
     public List<Event> getUserEvent(@PathVariable Integer id) {
         log.info("Запрос GET: getUserEvent(Integer id) на получение спаска событий по ID = {} пользователя.", id);
-        return eventService.getEventByUserId(id);
+        return eventService.get(id);
     }
 }

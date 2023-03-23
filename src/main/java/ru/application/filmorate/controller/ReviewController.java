@@ -27,9 +27,9 @@ public class ReviewController {
     }
 
     @GetMapping("{reviewId}")
-    public Review getById(@PositiveOrZero @PathVariable Integer reviewId) {
-        log.info("Запрос GET: getById(Integer reviewId) на получение отзыва по ID = {}.", reviewId);
-        return reviewService.getById(reviewId);
+    public Review get(@PositiveOrZero @PathVariable Integer reviewId) {
+        log.info("Запрос GET: get(Integer reviewId) на получение отзыва по ID = {}.", reviewId);
+        return reviewService.get(reviewId);
     }
 
     @PutMapping
@@ -45,12 +45,12 @@ public class ReviewController {
     }
 
     @GetMapping()
-    public List<Review> getAllByFilm(@RequestParam(name = "filmId", required = false) Integer filmId,
-                                     @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
+    public List<Review> get(@RequestParam(name = "filmId", required = false) Integer filmId,
+                            @RequestParam(name = "count", required = false, defaultValue = "10") Integer count
     ) {
-        log.info("Запрос GET: getAllByFilm(Integer filmId, Integer count) на получение списка отзывов по фильму" +
+        log.info("Запрос GET: get(Integer filmId, Integer count) на получение списка отзывов по фильму" +
                 " с параметрами: FILM ID = {}, COUNT = {}.", filmId, count);
-        return reviewService.getAllByFilm(filmId, count);
+        return reviewService.get(filmId, count);
     }
 
     @PutMapping("{reviewId}/like/{userId}")
@@ -85,8 +85,8 @@ public class ReviewController {
                               @PositiveOrZero @PathVariable Integer userId
     ) {
         log.info("Запрос DELETE: deleteDislike(Integer reviewId, Integer userId) на удаление дизлайка у отзыва = {} от " +
-                        "пользователя = {}.",
-                reviewId, userId);
+                        "пользователя = {}.", reviewId, userId
+        );
         reviewService.deleteDislike(reviewId, userId);
     }
 }

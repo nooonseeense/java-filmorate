@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.application.filmorate.util.enumeration.EventType;
-import ru.application.filmorate.util.enumeration.Operation;
+import ru.application.filmorate.storage.util.enumeration.EventType;
+import ru.application.filmorate.storage.util.enumeration.OperationType;
 
 import java.sql.Timestamp;
 
@@ -18,6 +18,6 @@ public class Event {
     Timestamp timestamp;
     int userId;
     EventType eventType;
-    Operation operation;
+    OperationType operation;
     int entityId;
 }
