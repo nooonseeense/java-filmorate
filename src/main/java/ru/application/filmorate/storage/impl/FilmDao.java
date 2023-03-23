@@ -86,61 +86,56 @@ public class FilmDao implements FilmStorage {
         if (genreId == null && year == null) {
             return jdbcTemplate.query(
                     "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                    "FROM FILM as f " +
-                    "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                    "LEFT JOIN MPA m on m.ID = f.MPA " +
-                    "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                    "SELECT FILM_ID " +
-                    "FROM LIKE_FILM) " +
-                    "ORDER BY COUNT(lf.film_id) DESC " +
-                    "LIMIT ?",
+                            "FROM FILM as f " +
+                            "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                            "LEFT JOIN MPA m on m.ID = f.MPA " +
+                            "GROUP BY f.ID, lf.FILM_ID "+
+                            "ORDER BY COUNT(lf.film_id) DESC " +
+                            "LIMIT ?",
                     Mapper::filmMapper, count
             );
         }
+
         if (genreId != null && year != null) {
             return jdbcTemplate.query(
                     "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                    "FROM FILM as f " +
-                    "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                    "LEFT JOIN MPA m on m.ID = f.MPA " +
-                    "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
-                    "WHERE fg.GENRE_ID = ? AND " +
-                    "YEAR(f.RELEASE_DATE) = ? " +
-                    "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                    "SELECT FILM_ID " +
-                    "FROM LIKE_FILM) " +
-                    "ORDER BY COUNT(lf.film_id) DESC " +
-                    "LIMIT ?",
+                            "FROM FILM as f " +
+                            "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                            "LEFT JOIN MPA m on m.ID = f.MPA " +
+                            "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
+                            "WHERE fg.GENRE_ID = ? AND " +
+                            "YEAR(f.RELEASE_DATE) = ? " +
+                            "GROUP BY f.ID, lf.FILM_ID " +
+                            "ORDER BY COUNT(lf.film_id) DESC " +
+                            "LIMIT ?",
                     Mapper::filmMapper, genreId, year, count
             );
         }
+
         if (genreId != null) {
             return jdbcTemplate.query(
                     "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                    "FROM FILM as f " +
-                    "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                    "LEFT JOIN MPA m on m.ID = f.MPA " +
-                    "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
-                    "WHERE fg.GENRE_ID = ? " +
-                    "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                    "SELECT FILM_ID " +
-                    "FROM LIKE_FILM) " +
-                    "ORDER BY COUNT(lf.film_id) DESC " +
-                    "LIMIT ?",
+                            "FROM FILM as f " +
+                            "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                            "LEFT JOIN MPA m on m.ID = f.MPA " +
+                            "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
+                            "WHERE fg.GENRE_ID = ? " +
+                            "GROUP BY f.ID, lf.FILM_ID " +
+                            "ORDER BY COUNT(lf.film_id) DESC " +
+                            "LIMIT ?",
                     Mapper::filmMapper, genreId, count
             );
         }
+
         return jdbcTemplate.query(
                 "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                "FROM FILM as f " +
-                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                "LEFT JOIN MPA m on m.ID = f.MPA " +
-                "WHERE YEAR(f.RELEASE_DATE) = ? " +
-                "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                "SELECT FILM_ID " +
-                "FROM LIKE_FILM) " +
-                "ORDER BY COUNT(lf.film_id) DESC " +
-                "LIMIT ?",
+                        "FROM FILM as f " +
+                        "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                        "LEFT JOIN MPA m on m.ID = f.MPA " +
+                        "WHERE YEAR(f.RELEASE_DATE) = ? " +
+                        "GROUP BY f.ID, lf.FILM_ID " +
+                        "ORDER BY COUNT(lf.film_id) DESC " +
+                        "LIMIT ?",
                 Mapper::filmMapper, year, count
         );
     }
