@@ -116,4 +116,6 @@ public interface FilmStorage {
      * @param id id фильма
      */
     void remove(Integer id);
+
+    Boolean isExist(Integer filmId);
 }

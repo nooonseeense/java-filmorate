@@ -146,6 +146,12 @@ public class ReviewDao implements ReviewStorage {
         jdbcTemplate.update(sql, reviewUseful, reviewId);
     }
 
+    @Override
+    public Boolean isExist(Integer reviewId) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT * FROM REVIEW WHERE ID = ?)",
+                Boolean.class, reviewId);
+    }
+
     /**
      * Метод получения полезности отзыва
      * @param reviewId id отзыва

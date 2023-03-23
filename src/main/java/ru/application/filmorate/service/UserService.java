@@ -1,7 +1,9 @@
 package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.FilmStorage;
@@ -12,7 +14,7 @@ import ru.application.filmorate.storage.util.enumeration.OperationType;
 
 import java.util.List;
 
-
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -136,6 +138,16 @@ public class UserService {
             user.setName(user.getLogin());
         }
     }
+
+    /**
+     * Метод проверки пользователя в БД
+     *
+     * @param userId id пользователя
+     */
+    public void exists(Integer userId) {
+        if (!userStorage.isExist(userId)) {
+            log.debug("Пользователь с id: {} не найден", userId);
+            throw new ObjectWasNotFoundException(String.format("Пользователь с id: %s не найден", userId));
+        }
+    }
 }
-
-

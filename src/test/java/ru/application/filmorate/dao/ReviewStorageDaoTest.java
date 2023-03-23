@@ -13,6 +13,9 @@ import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Mpa;
 import ru.application.filmorate.model.Review;
 import ru.application.filmorate.model.User;
+import ru.application.filmorate.storage.impl.FilmDao;
+import ru.application.filmorate.storage.impl.ReviewDao;
+import ru.application.filmorate.storage.impl.UserDao;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ReviewStorageDaoTest {
 
-    private final FilmDbStorageDao filmStorage;
-    private final UserStorageDao userStorage;
-    private final ReviewStorageDao reviewStorage;
+    private final FilmDao filmStorage;
+    private final UserDao userStorage;
+    private final ReviewDao reviewStorage;
 
     private Review goodReview;
     private Review badReview;
@@ -98,7 +101,7 @@ class ReviewStorageDaoTest {
         userStorage.create(user);
         Review addedReview = reviewStorage.add(goodReview);
 
-        Review reviewFromDb = reviewStorage.getById(addedReview.getReviewId());
+        Review reviewFromDb = reviewStorage.get(addedReview.getReviewId());
 
         assertEquals(reviewFromDb.getReviewId(), 1);
     }
@@ -114,7 +117,7 @@ class ReviewStorageDaoTest {
         goodReview.setIsPositive(Boolean.FALSE);
 
         reviewStorage.update(goodReview);
-        Review reviewFromDb = reviewStorage.getById(addedReview.getReviewId());
+        Review reviewFromDb = reviewStorage.get(addedReview.getReviewId());
 
         assertEquals(reviewFromDb.getContent(), "Bad Film");
         assertEquals(reviewFromDb.getIsPositive(), false);
@@ -130,7 +133,7 @@ class ReviewStorageDaoTest {
         reviewStorage.delete(addedReview.getReviewId());
 
         assertThrows(EmptyResultDataAccessException.class,
-                () -> reviewStorage.getById(addedReview.getReviewId()));
+                () -> reviewStorage.get(addedReview.getReviewId()));
     }
 
     @Test
@@ -140,7 +143,7 @@ class ReviewStorageDaoTest {
         userStorage.create(user);
         reviewStorage.add(goodReview);
 
-        List<Review> reviews = reviewStorage.getAll();
+        List<Review> reviews = reviewStorage.get();
 
         assertEquals(reviews.size(), 1);
     }
@@ -272,14 +275,14 @@ class ReviewStorageDaoTest {
 
         reviewStorage.addLike(addedReview.getReviewId(), user.getId());
         reviewStorage.recalculateUseful(addedReview.getReviewId());
-        Review reviewFromDb = reviewStorage.getById(addedReview.getReviewId());
+        Review reviewFromDb = reviewStorage.get(addedReview.getReviewId());
 
         assertEquals(reviewFromDb.getUseful(), 1);
 
         reviewStorage.deleteLike(addedReview.getReviewId(), user.getId());
         reviewStorage.addDislike(addedReview.getReviewId(), user.getId());
         reviewStorage.recalculateUseful(addedReview.getReviewId());
-        Review reviewAfterDislike = reviewStorage.getById(addedReview.getReviewId());
+        Review reviewAfterDislike = reviewStorage.get(addedReview.getReviewId());
 
         assertEquals(reviewAfterDislike.getUseful(), -1);
     }

@@ -95,4 +95,10 @@ public class UserDao implements UserStorage {
             throw new ObjectWasNotFoundException(message);
         }
     }
+
+    @Override
+    public Boolean isExist(Integer userId) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT * FROM USERS WHERE ID = ?)",
+                Boolean.class, userId);
+    }
 }
