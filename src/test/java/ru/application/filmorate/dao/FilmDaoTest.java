@@ -35,7 +35,7 @@ public class FilmDaoTest {
                 .mpa(new Mpa(1, "G"))
                 .build();
 
-        Film filmInDb = filmController.getById(filmExpected.getId());
+        Film filmInDb = filmController.get(filmExpected.getId());
 
         assertEquals(filmExpected.getId(), filmInDb.getId());
         assertEquals(filmExpected.getName(), filmInDb.getName());
@@ -127,7 +127,7 @@ public class FilmDaoTest {
 
 
         filmController.update(filmExpected);
-        Film actualFilm = filmController.getById(filmExpected.getId());
+        Film actualFilm = filmController.get(filmExpected.getId());
 
         assertEquals(filmExpected.getId(), actualFilm.getId());
         assertEquals(filmExpected.getName(), actualFilm.getName());
