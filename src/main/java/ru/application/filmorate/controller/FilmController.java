@@ -30,7 +30,7 @@ public class FilmController {
     }
 
     @GetMapping("{filmId}")
-    public Film getById(@PositiveOrZero @PathVariable Integer filmId) {
+    public Film get(@PositiveOrZero @PathVariable Integer filmId) {
         log.info("Запрос GET: get(Integer filmId) на получение фильма по ID = {}.", filmId);
         return filmService.get(filmId);
     }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.FriendStorage;
 import ru.application.filmorate.storage.util.Mapper;
@@ -22,11 +22,11 @@ public class FriendDao implements FriendStorage {
             jdbcTemplate.update("INSERT INTO FRIEND(USER1_ID, USER2_ID) VALUES (?, ?)", id, friendId);
             log.info("addFriends(Integer id, Integer friendId): Пользователь с id = {} и id = {} стали друзьями.",
                     id, friendId);
-        } catch (ObjectWasNotFoundException e) {
+        } catch (ObjectDoesNotExist e) {
             String message = String.format("Пользователь с id = %d или id = %d не найден.", id, friendId);
             log.debug("addFriends(Integer id, Integer friendId): Пользователь с id = {} или id = {} не найден.",
                     id, friendId);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 

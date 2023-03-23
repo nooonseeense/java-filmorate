@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
@@ -75,10 +75,8 @@ public class FilmDao implements FilmStorage {
             sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') OR ");
             sql.append("LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
         }
-        sql.append("GROUP BY f.ID, lf.FILM_ID IN ( " +
-                "SELECT FILM_ID " +
-                "FROM LIKE_FILM) " +
-                "ORDER BY COUNT(lf.film_id) DESC");
+        sql.append("GROUP BY f.ID, lf.FILM_ID " +
+                   "ORDER BY COUNT(lf.film_id) DESC");
         return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
     }
 
@@ -86,61 +84,56 @@ public class FilmDao implements FilmStorage {
         if (genreId == null && year == null) {
             return jdbcTemplate.query(
                     "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                    "FROM FILM as f " +
-                    "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                    "LEFT JOIN MPA m on m.ID = f.MPA " +
-                    "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                    "SELECT FILM_ID " +
-                    "FROM LIKE_FILM) " +
-                    "ORDER BY COUNT(lf.film_id) DESC " +
-                    "LIMIT ?",
+                            "FROM FILM as f " +
+                            "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                            "LEFT JOIN MPA m on m.ID = f.MPA " +
+                            "GROUP BY f.ID, lf.FILM_ID "+
+                            "ORDER BY COUNT(lf.film_id) DESC " +
+                            "LIMIT ?",
                     Mapper::filmMapper, count
             );
         }
+
         if (genreId != null && year != null) {
             return jdbcTemplate.query(
                     "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                    "FROM FILM as f " +
-                    "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                    "LEFT JOIN MPA m on m.ID = f.MPA " +
-                    "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
-                    "WHERE fg.GENRE_ID = ? AND " +
-                    "YEAR(f.RELEASE_DATE) = ? " +
-                    "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                    "SELECT FILM_ID " +
-                    "FROM LIKE_FILM) " +
-                    "ORDER BY COUNT(lf.film_id) DESC " +
-                    "LIMIT ?",
+                            "FROM FILM as f " +
+                            "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                            "LEFT JOIN MPA m on m.ID = f.MPA " +
+                            "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
+                            "WHERE fg.GENRE_ID = ? AND " +
+                            "YEAR(f.RELEASE_DATE) = ? " +
+                            "GROUP BY f.ID, lf.FILM_ID " +
+                            "ORDER BY COUNT(lf.film_id) DESC " +
+                            "LIMIT ?",
                     Mapper::filmMapper, genreId, year, count
             );
         }
+
         if (genreId != null) {
             return jdbcTemplate.query(
                     "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                    "FROM FILM as f " +
-                    "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                    "LEFT JOIN MPA m on m.ID = f.MPA " +
-                    "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
-                    "WHERE fg.GENRE_ID = ? " +
-                    "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                    "SELECT FILM_ID " +
-                    "FROM LIKE_FILM) " +
-                    "ORDER BY COUNT(lf.film_id) DESC " +
-                    "LIMIT ?",
+                            "FROM FILM as f " +
+                            "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                            "LEFT JOIN MPA m on m.ID = f.MPA " +
+                            "LEFT JOIN FILM_GENRE fg on f.ID = fg.FILM_ID " +
+                            "WHERE fg.GENRE_ID = ? " +
+                            "GROUP BY f.ID, lf.FILM_ID " +
+                            "ORDER BY COUNT(lf.film_id) DESC " +
+                            "LIMIT ?",
                     Mapper::filmMapper, genreId, count
             );
         }
+
         return jdbcTemplate.query(
                 "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                "FROM FILM as f " +
-                "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
-                "LEFT JOIN MPA m on m.ID = f.MPA " +
-                "WHERE YEAR(f.RELEASE_DATE) = ? " +
-                "GROUP BY f.ID, lf.FILM_ID IN ( " +
-                "SELECT FILM_ID " +
-                "FROM LIKE_FILM) " +
-                "ORDER BY COUNT(lf.film_id) DESC " +
-                "LIMIT ?",
+                        "FROM FILM as f " +
+                        "LEFT JOIN LIKE_FILM lf ON f.ID = lf.FILM_ID " +
+                        "LEFT JOIN MPA m on m.ID = f.MPA " +
+                        "WHERE YEAR(f.RELEASE_DATE) = ? " +
+                        "GROUP BY f.ID, lf.FILM_ID " +
+                        "ORDER BY COUNT(lf.film_id) DESC " +
+                        "LIMIT ?",
                 Mapper::filmMapper, year, count
         );
     }
@@ -148,16 +141,15 @@ public class FilmDao implements FilmStorage {
     @Override
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {
         return jdbcTemplate.query(
-                "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
-                "FROM FILM AS f " +
-                "LEFT JOIN LIKE_FILM AS lf ON f.ID = lf.FILM_ID " +
-                "LEFT JOIN MPA AS m ON m.ID = f.MPA " +
-                "WHERE f.ID IN (SELECT f.ID FROM FILM AS f " +
-                "LEFT JOIN LIKE_FILM AS lfu ON lfu.FILM_ID = f.ID " +
-                "LEFT JOIN LIKE_FILM AS lff ON lff.FILM_ID = f.ID " +
-                "WHERE lfu.USER_ID = ? AND lff.USER_ID = ?) " +
-                "GROUP BY f.ID " +
-                "ORDER BY COUNT(lf.FILM_ID) DESC",
+                "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME, COUNT(lf.FILM_ID) " +
+                        "FROM FILM AS f " +
+                        "LEFT JOIN LIKE_FILM AS lf ON f.ID = lf.FILM_ID " +
+                        "LEFT JOIN MPA AS m ON m.ID = f.MPA " +
+                        "LEFT JOIN LIKE_FILM AS lfu ON lfu.FILM_ID = f.ID AND lfu.USER_ID = ? " +
+                        "LEFT JOIN LIKE_FILM AS lff ON lff.FILM_ID = f.ID AND lff.USER_ID = ? " +
+                        "WHERE lfu.USER_ID IS NOT NULL AND lff.USER_ID IS NOT NULL " +
+                        "GROUP BY f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION, m.ID, m.NAME " +
+                        "ORDER BY COUNT(lf.FILM_ID) DESC",
                 Mapper::filmMapper, userId, friendId
         );
     }
@@ -169,11 +161,11 @@ public class FilmDao implements FilmStorage {
                 return jdbcTemplate.query(
                         "SELECT * " +
                                 "FROM FILM AS f " +
-                                "LEFT JOIN MPA AS m ON f.mpa = m.id " +
-                                "LEFT JOIN FILM_DIRECTOR AS fd ON f.id = fd.film_id " +
-                                "LEFT JOIN DIRECTOR AS d ON fd.director_id = d.id " +
-                                "WHERE d.id = ? " +
-                                "GROUP BY f.id " +
+                                "LEFT JOIN MPA AS m ON f.MPA = m.ID " +
+                                "LEFT JOIN FILM_DIRECTOR AS fd ON f.ID = fd.FILM_ID " +
+                                "LEFT JOIN DIRECTOR AS d ON fd.DIRECTOR_ID = d.ID " +
+                                "WHERE d.ID = ? " +
+                                "GROUP BY f.ID " +
                                 "ORDER BY f.RELEASE_DATE",
                         Mapper::filmMapper, directorId
                 );
@@ -181,12 +173,12 @@ public class FilmDao implements FilmStorage {
                 return jdbcTemplate.query(
                         "SELECT * " +
                                 "FROM FILM AS f " +
-                                "LEFT JOIN LIKE_FILM AS lf ON f.id = lf.film_id " +
-                                "LEFT JOIN MPA AS m ON f.mpa = m.id " +
-                                "LEFT JOIN FILM_DIRECTOR AS fd ON f.id = fd.film_id " +
-                                "LEFT JOIN DIRECTOR AS d ON fd.director_id = d.id " +
-                                "WHERE d.id = ? " +
-                                "GROUP BY f.id " +
+                                "LEFT JOIN LIKE_FILM AS lf ON f.ID = lf.FILM_ID " +
+                                "LEFT JOIN MPA AS m ON f.MPA = m.ID " +
+                                "LEFT JOIN FILM_DIRECTOR AS fd ON f.ID = fd.FILM_ID " +
+                                "LEFT JOIN DIRECTOR AS d ON fd.DIRECTOR_ID = d.ID " +
+                                "WHERE d.ID = ? " +
+                                "GROUP BY f.ID " +
                                 "ORDER BY COUNT(lf.FILM_ID) DESC",
                         Mapper::filmMapper, directorId
                 );
@@ -228,7 +220,7 @@ public class FilmDao implements FilmStorage {
         if (newRows == 0) {
             String message = String.format("Фильм с ID = %d не найден.", film.getId());
             log.debug("update(Film film): Фильм с ID = {} не найден.", film.getId());
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
         set(film);
         return film;
@@ -289,7 +281,7 @@ public class FilmDao implements FilmStorage {
         if (jdbcTemplate.update("DELETE FROM FILM WHERE ID = ? ", id) == 0) {
             String message = String.format("Фильм с id = %d не найден.", id);
             log.debug("update(Film film): Фильм с ID = {} не найден.", id);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 
@@ -302,18 +294,18 @@ public class FilmDao implements FilmStorage {
     public List<Film> getRecommendedFilms(Integer userId) {
         List<Film> films = jdbcTemplate.query(
                 "SELECT f.ID, f.NAME, m.ID, m.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION " +
-                "FROM LIKE_FILM AS lf1 " +
-                "JOIN LIKE_FILM AS lf2 ON lf2.FILM_ID = lf1.FILM_ID AND lf1.USER_ID = ? " +
-                "JOIN LIKE_FILM AS lf3 ON lf3.USER_ID = lf2.USER_ID AND lf3.USER_ID <> ? " +
-                "AND lf3.FILM_ID NOT IN (SELECT FILM_ID " +
-                "FROM LIKE_FILM " +
-                "WHERE USER_ID = ?) " +
-                "JOIN FILM AS f ON f.ID = lf3.FILM_ID " +
-                "JOIN MPA AS m ON f.MPA = m.ID " +
-                "GROUP BY lf3.FILM_ID, f.ID " +
-                "ORDER BY COUNT(*) DESC",
+                        "FROM LIKE_FILM AS lf1 " +
+                        "JOIN LIKE_FILM AS lf2 ON lf2.FILM_ID = lf1.FILM_ID AND lf1.USER_ID = ? " +
+                        "JOIN LIKE_FILM AS lf3 ON lf3.USER_ID = lf2.USER_ID AND lf3.USER_ID <> ? " +
+                        "LEFT JOIN LIKE_FILM AS lf4 ON lf4.USER_ID = ? AND lf4.FILM_ID = lf3.FILM_ID " +
+                        "JOIN FILM AS f ON f.ID = lf3.FILM_ID " +
+                        "JOIN MPA AS m ON f.MPA = m.ID " +
+                        "WHERE lf4.ID IS NULL " +
+                        "GROUP BY lf3.FILM_ID, f.ID " +
+                        "ORDER BY COUNT(*) DESC",
                 Mapper::filmMapper, userId, userId, userId
         );
+
         filmGenreStorage.set(films);
         return films;
     }

@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.exception.IncorrectParameterException;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.storage.*;
@@ -58,7 +58,7 @@ public class FilmService {
         } catch (EmptyResultDataAccessException e) {
             String message = String.format("Фильм с id = %d не найден.", filmId);
             log.debug("get(Integer filmId): Фильм с id = {} не найден.", filmId);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 
@@ -88,7 +88,7 @@ public class FilmService {
         if (!SAMPLE.contains(by)) {
             log.debug("getPopularMoviesFromAdvancedSearch(String query, String by): " +
                     "Некорректное значение выборки поиска в поле BY = {}", by);
-            throw new IncorrectParameterException("Некорректное значение выборки поиска");
+            throw new IllegalArgumentException("Некорректное значение выборки поиска");
         }
         List<Film> films = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
         filmGenreStorage.set(films);
@@ -122,7 +122,7 @@ public class FilmService {
         if (director.isEmpty()) {
             String message = String.format("Режиссер с id = %d не найден.", directorId);
             log.debug("get(int directorId, FilmSort sortBy): Режиссер с id = {} не найден.", directorId);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
         List<Film> films = filmStorage.get(directorId, sortBy);
         filmGenreStorage.set(films);
@@ -197,7 +197,7 @@ public class FilmService {
     public void exists(Integer filmId) {
         if (!filmStorage.isExist(filmId)) {
             log.debug("Фильм с id: {} не найден", filmId);
-            throw new ObjectWasNotFoundException(String.format("Фильм с id: %s не найден", filmId));
+            throw new ObjectDoesNotExist(String.format("Фильм с id: %s не найден", filmId));
         }
     }
 }
