@@ -8,16 +8,15 @@ import ru.application.filmorate.exception.IncorrectParameterException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.storage.DirectorStorage;
-import ru.application.filmorate.storage.FilmStorage;
-import ru.application.filmorate.storage.FilmGenreStorage;
-import ru.application.filmorate.storage.LikeStorage;
-import ru.application.filmorate.storage.MpaStorage;
+import ru.application.filmorate.storage.*;
 import ru.application.filmorate.storage.util.enumeration.EventType;
 import ru.application.filmorate.storage.util.enumeration.FilmSortType;
 import ru.application.filmorate.storage.util.enumeration.OperationType;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
 
 import static ru.application.filmorate.storage.util.constant.Constants.SAMPLE;
 
@@ -188,5 +187,17 @@ public class FilmService {
      */
     public void remove(Integer id) {
         filmStorage.remove(id);
+    }
+
+    /**
+     * Метод проверки фильма в БД
+     *
+     * @param filmId id фильма
+     */
+    public void exists(Integer filmId) {
+        if (!filmStorage.isExist(filmId)) {
+            log.debug("Фильм с id: {} не найден", filmId);
+            throw new ObjectWasNotFoundException(String.format("Фильм с id: %s не найден", filmId));
+        }
     }
 }

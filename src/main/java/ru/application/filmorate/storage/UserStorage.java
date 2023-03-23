@@ -42,4 +42,12 @@ public interface UserStorage {
      * @param id id пользователя
      */
     void remove(Integer id);
+
+    /**
+     * Метод проверки существоввания пользователя
+     *
+     * @param userId id пользователя
+     * @return true пользователь существует, false пользователь не найден
+     */
+    Boolean isExist(Integer userId);
 }

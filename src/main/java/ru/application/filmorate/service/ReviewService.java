@@ -33,7 +33,7 @@ public class ReviewService {
      * @return Созданный объект отзыва
      */
     public Review add(Review review) {
-        validateReview(review);
+        validation(review);
         Review addedReview = reviewStorage.add(review);
         eventService.create(addedReview.getUserId(), EventType.REVIEW, OperationType.ADD, addedReview.getReviewId());
         return addedReview;
@@ -46,7 +46,7 @@ public class ReviewService {
      * @return Изменённый объект отзыва
      */
     public Review update(Review review) {
-        validateReview(review);
+        validation(review);
         Review updatedReview = reviewStorage.update(review);
         eventService.create(updatedReview.getUserId(), EventType.REVIEW, OperationType.UPDATE, updatedReview.getReviewId());
         return updatedReview;
@@ -105,7 +105,8 @@ public class ReviewService {
      * @param userId   id пользователя
      */
     public void addLike(Integer reviewId, Integer userId) {
-        validateReviewAndUser(reviewId, userId);
+        exists(reviewId);
+        userService.exists(userId);
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isPresent()) {
             if (isLike.get()) {
@@ -129,7 +130,8 @@ public class ReviewService {
      * @param userId   id пользователя
      */
     public void addDislike(Integer reviewId, Integer userId) {
-        validateReviewAndUser(reviewId, userId);
+        exists(reviewId);
+        userService.exists(userId);
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isPresent()) {
             if (!isLike.get()) {
@@ -153,7 +155,8 @@ public class ReviewService {
      * @param userId   id пользователя
      */
     public void deleteLike(Integer reviewId, Integer userId) {
-        validateReviewAndUser(reviewId, userId);
+        exists(reviewId);
+        userService.exists(userId);
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isEmpty()) {
             log.debug("deleteLike(Integer reviewId, Integer userId): У отзыва с id: {} нет лайка " +
@@ -173,7 +176,8 @@ public class ReviewService {
      * @param userId   id пользователя
      */
     public void deleteDislike(Integer reviewId, Integer userId) {
-        validateReviewAndUser(reviewId, userId);
+        exists(reviewId);
+        userService.exists(userId);
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isEmpty()) {
             log.debug("deleteDislike(Integer reviewId, Integer userId): У отзыва с id: {} нет дизлайка " +
@@ -187,23 +191,24 @@ public class ReviewService {
     }
 
     /**
-     * Метод проверки отзыва на наличие в БД
+     * Метод валидации отзыва
      *
      * @param review Объект отзыва
      */
-    private void validateReview(Review review) {
-        filmService.get(review.getFilmId());
-        userService.get(review.getUserId());
+    public void validation(Review review) {
+        filmService.exists(review.getFilmId());
+        userService.exists(review.getUserId());
     }
 
     /**
-     * Метод проверки пользователя и отзыва в БД
+     * Метод проверки отзыва в БД
      *
      * @param reviewId id отзыва
-     * @param userId   id пользователя
      */
-    private void validateReviewAndUser(Integer reviewId, Integer userId) {
-        get(reviewId);
-        userService.get(userId);
+    public void exists(Integer reviewId) {
+        if (!reviewStorage.isExist(reviewId)) {
+            log.debug("Отзыв с id: {} не найден", reviewId);
+            throw new ObjectWasNotFoundException(String.format("Отзыв с id: %s не найден", reviewId));
+        }
     }
 }

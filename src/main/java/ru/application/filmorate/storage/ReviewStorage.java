@@ -84,7 +84,7 @@ public interface ReviewStorage {
      *
      * @param reviewId id отзыва
      * @param userId   id пользователя
-     * @return Булевое значение
+     * @return Empty лайк/дизлайк отсутствует, true лайк, false дизлайк
      */
     Optional<Boolean> isLike(Integer reviewId, Integer userId);
 
@@ -93,7 +93,7 @@ public interface ReviewStorage {
      *
      * @param reviewId id отзыва
      * @param userId   id пользователя
-     * @param rate Булевое значение
+     * @param rate     true лайк, false дизлайк
      */
     void changeUserLike(Integer reviewId, Integer userId, boolean rate);
 
@@ -103,4 +103,12 @@ public interface ReviewStorage {
      * @param reviewId id отзыва
      */
     void recalculateUseful(Integer reviewId);
+
+    /**
+     * Метод проверки существоввания отзыва
+     *
+     * @param reviewId id отзыва
+     * @return true отзыв существует, false отзыв не найден
+     */
+    Boolean isExist(Integer reviewId);
 }

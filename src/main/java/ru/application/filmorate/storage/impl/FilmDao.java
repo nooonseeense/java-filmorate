@@ -287,6 +287,12 @@ public class FilmDao implements FilmStorage {
         }
     }
 
+    @Override
+    public Boolean isExist(Integer filmId) {
+        return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT * FROM FILM WHERE ID = ?)",
+                Boolean.class, filmId);
+    }
+
     public List<Film> getRecommendedFilms(Integer userId) {
         List<Film> films = jdbcTemplate.query(
                 "SELECT f.ID, f.NAME, m.ID, m.NAME, f.DESCRIPTION, f.RELEASE_DATE, f.DURATION " +
