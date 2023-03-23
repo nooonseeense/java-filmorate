@@ -10,7 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.storage.DirectorStorage;
@@ -71,7 +71,7 @@ public class DirectorDao implements DirectorStorage {
         if (newRows == 0) {
             String message = "Директор " + director + " не найден.";
             log.debug("update(Director director): Режиссёр {} не найден.", director);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
         return director;
     }
@@ -82,7 +82,7 @@ public class DirectorDao implements DirectorStorage {
         if (result == 0) {
             String message = "Режиссер с id = " + id + " не найден.";
             log.debug("delete(int id): Режиссер с id = {} не найден.", id);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 

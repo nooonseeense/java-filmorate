@@ -7,7 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Review;
 import ru.application.filmorate.storage.util.Mapper;
 import ru.application.filmorate.storage.ReviewStorage;
@@ -63,7 +63,7 @@ public class ReviewDao implements ReviewStorage {
         );
         if (newRows == 0) {
             log.debug("update(Review review): Отзыв с ID = {} не найден.", review.getReviewId());
-            throw new ObjectWasNotFoundException(String.format("Отзыв с ID = %d не найден.", review.getReviewId()));
+            throw new ObjectDoesNotExist(String.format("Отзыв с ID = %d не найден.", review.getReviewId()));
         }
         return get(review.getReviewId());
     }

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.exception.ReviewValidationException;
 import ru.application.filmorate.model.Review;
 import ru.application.filmorate.storage.ReviewStorage;
@@ -63,7 +63,7 @@ public class ReviewService {
             return reviewStorage.get(reviewId);
         } catch (EmptyResultDataAccessException e) {
             log.debug("get(Integer reviewId): Отзыв с идентификатором {} не найден.", reviewId);
-            throw new ObjectWasNotFoundException(String.format("Отзыв с идентификатором %d не найден.", reviewId));
+            throw new ObjectDoesNotExist(String.format("Отзыв с идентификатором %d не найден.", reviewId));
         }
     }
 
@@ -208,7 +208,7 @@ public class ReviewService {
     public void exists(Integer reviewId) {
         if (!reviewStorage.isExist(reviewId)) {
             log.debug("Отзыв с id: {} не найден", reviewId);
-            throw new ObjectWasNotFoundException(String.format("Отзыв с id: %s не найден", reviewId));
+            throw new ObjectDoesNotExist(String.format("Отзыв с id: %s не найден", reviewId));
         }
     }
 }

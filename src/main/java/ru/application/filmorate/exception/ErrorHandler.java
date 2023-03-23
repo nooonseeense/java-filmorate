@@ -39,20 +39,6 @@ public class ErrorHandler {
         return Map.of(ERROR, e.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleIncorrectParameterException(final IncorrectParameterException e) {
-        log.warn("Некорректные параметры ввода.");
-        return Map.of(ERROR, e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundEx(final ObjectWasNotFoundException e) {
-        log.warn("Объект не был найден.");
-        return Map.of(ERROR, e.getMessage());
-    }
-
     @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleNullOrIllegalArgumentEx(final RuntimeException e) {

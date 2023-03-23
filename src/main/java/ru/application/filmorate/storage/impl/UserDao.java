@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.util.Mapper;
 import ru.application.filmorate.storage.UserStorage;
@@ -45,7 +45,7 @@ public class UserDao implements UserStorage {
         } catch (EmptyResultDataAccessException e) {
             String message = String.format("Пользователь с id = %d не найден.", userId);
             log.debug("getById(Integer userId): Пользователь с id = {} не найден.", userId);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 
@@ -81,7 +81,7 @@ public class UserDao implements UserStorage {
         if (updateRows == 0) {
             String message = String.format("Пользователь с идентификатором %d не найден.", user.getId());
             log.debug("update(User user): Пользователь с идентификатором {} не найден.", user.getId());
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         } else {
             return user;
         }
@@ -92,7 +92,7 @@ public class UserDao implements UserStorage {
         if (jdbcTemplate.update("DELETE FROM USERS WHERE ID = ? ", id) == 0) {
             String message = String.format("Пользователь с id = %d не найден.", id);
             log.debug("removeUserById(Integer id): Пользователь с id = {} не найден.", id);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 
