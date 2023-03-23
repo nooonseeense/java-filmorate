@@ -3,10 +3,10 @@ package ru.application.filmorate.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.Event;
-import ru.application.filmorate.storage.event.EventStorage;
-import ru.application.filmorate.storage.user.UserStorage;
-import ru.application.filmorate.util.enumeration.EventType;
-import ru.application.filmorate.util.enumeration.Operation;
+import ru.application.filmorate.storage.EventStorage;
+import ru.application.filmorate.storage.UserStorage;
+import ru.application.filmorate.storage.util.enumeration.EventType;
+import ru.application.filmorate.storage.util.enumeration.OperationType;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -24,9 +24,9 @@ public class EventService {
      * @param userId id пользователя
      * @return Список событий
      */
-    public List<Event> getEventByUserId(int userId) {
-        userStorage.getById(userId);
-        return eventStorage.getEventByUserId(userId);
+    public List<Event> get(int userId) {
+        userStorage.get(userId);
+        return eventStorage.get(userId);
     }
 
     /**
@@ -34,20 +34,20 @@ public class EventService {
      *
      * @param userId    id пользователя
      * @param eventType Тип события
-     * @param operation Тип операции
+     * @param operationType Тип операции
      * @param entityId  Идентификатор сущности, с которой произошло событие
      */
-    public void createEvent(int userId, EventType eventType, Operation operation, int entityId) {
+    public void create(int userId, EventType eventType, OperationType operationType, int entityId) {
         Event event = Event.builder()
                 .timestamp(Timestamp.from(Instant.now()))
                 .userId(userId)
                 .eventType(eventType)
-                .operation(operation)
+                .operationType(operationType)
                 .entityId(entityId)
                 .build();
 
         if (event != null) {
-            eventStorage.addEvent(event);
+            eventStorage.add(event);
         }
     }
 }

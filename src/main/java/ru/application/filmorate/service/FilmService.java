@@ -8,18 +8,18 @@ import ru.application.filmorate.exception.IncorrectParameterException;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.storage.director.DirectorStorage;
-import ru.application.filmorate.storage.film.FilmStorage;
-import ru.application.filmorate.storage.filmgenre.FilmGenreStorage;
-import ru.application.filmorate.storage.like.LikeStorage;
-import ru.application.filmorate.storage.mpa.MpaStorage;
-import ru.application.filmorate.util.enumeration.EventType;
-import ru.application.filmorate.util.enumeration.FilmSort;
-import ru.application.filmorate.util.enumeration.Operation;
+import ru.application.filmorate.storage.DirectorStorage;
+import ru.application.filmorate.storage.FilmStorage;
+import ru.application.filmorate.storage.FilmGenreStorage;
+import ru.application.filmorate.storage.LikeStorage;
+import ru.application.filmorate.storage.MpaStorage;
+import ru.application.filmorate.storage.util.enumeration.EventType;
+import ru.application.filmorate.storage.util.enumeration.FilmSortType;
+import ru.application.filmorate.storage.util.enumeration.OperationType;
 
 import java.util.*;
 
-import static ru.application.filmorate.util.Constants.SAMPLE;
+import static ru.application.filmorate.storage.util.constant.Constants.SAMPLE;
 
 @Slf4j
 @Service
@@ -39,8 +39,8 @@ public class FilmService {
      */
     public List<Film> get() {
         List<Film> films = filmStorage.get();
-        filmGenreStorage.setGenres(films);
-        directorStorage.setDirectors(films);
+        filmGenreStorage.set(films);
+        directorStorage.set(films);
         return films;
     }
 
@@ -50,16 +50,15 @@ public class FilmService {
      * @param filmId id фильма
      * @return Объект фильма
      */
-    public Film getById(Integer filmId) {
+    public Film get(Integer filmId) {
         try {
-            Film film = filmStorage.getById(filmId);
-            assert film != null;
+            Film film = filmStorage.get(filmId);
             film.setGenres(new LinkedHashSet<>(filmGenreStorage.get(filmId)));
-             directorStorage.setDirectors(Collections.singletonList(film));
+            directorStorage.set(Collections.singletonList(film));
             return film;
         } catch (EmptyResultDataAccessException e) {
             String message = String.format("Фильм с id = %d не найден.", filmId);
-            log.debug("FilmService getById(Integer filmId): Фильм с id = {} не найден.", filmId);
+            log.debug("get(Integer filmId): Фильм с id = {} не найден.", filmId);
             throw new ObjectWasNotFoundException(message);
         }
     }
@@ -73,20 +72,10 @@ public class FilmService {
      * @return Список фильмов
      */
     public List<Film> getPopularMoviesByLikes(Integer count, Integer genreId, Short year) {
-        List<Film> popularMoviesByLikes = new ArrayList<>();
-        if (genreId == null && year == null) {
-             popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count);
-        }
-        if (genreId != null && year != null) {
-            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count, genreId, year);
-        } else if (genreId != null) {
-            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count, genreId);
-        } else if (year != null) {
-            popularMoviesByLikes = filmStorage.getPopularMoviesByLikes(count, year);
-        }
-        filmGenreStorage.setGenres(popularMoviesByLikes);
-        directorStorage.setDirectors(popularMoviesByLikes);
-        return popularMoviesByLikes;
+        List<Film> films = filmStorage.getPopularMoviesByLikes(count, genreId, year);
+        filmGenreStorage.set(films);
+        directorStorage.set(films);
+        return films;
     }
 
     /**
@@ -97,16 +86,15 @@ public class FilmService {
      * @return Список фильмов
      */
     public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
-        List<Film> resultPopularMoviesFromAdvancedSearch;
         if (!SAMPLE.contains(by)) {
-            log.debug("FilmService getPopularMoviesFromAdvancedSearch(String query, String by): Некорректное значение " +
-                    "выборки поиска в поле BY = {}", by);
+            log.debug("getPopularMoviesFromAdvancedSearch(String query, String by): " +
+                    "Некорректное значение выборки поиска в поле BY = {}", by);
             throw new IncorrectParameterException("Некорректное значение выборки поиска");
         }
-        resultPopularMoviesFromAdvancedSearch = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
-        filmGenreStorage.setGenres(resultPopularMoviesFromAdvancedSearch);
-        directorStorage.setDirectors(resultPopularMoviesFromAdvancedSearch);
-        return resultPopularMoviesFromAdvancedSearch;
+        List<Film> films = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
+        filmGenreStorage.set(films);
+        directorStorage.set(films);
+        return films;
     }
 
     /**
@@ -118,8 +106,8 @@ public class FilmService {
      */
     public List<Film> getCommonMovies(Integer userId, Integer friendId) {
         List<Film> commonMovies = filmStorage.getCommonMovies(userId, friendId);
-        filmGenreStorage.setGenres(commonMovies);
-        directorStorage.setDirectors(commonMovies);
+        filmGenreStorage.set(commonMovies);
+        directorStorage.set(commonMovies);
         return commonMovies;
     }
 
@@ -130,16 +118,16 @@ public class FilmService {
      * @param sortBy     Сортировка по лайкам или году
      * @return Список фильмов по ID режиссёра
      */
-    public List<Film> getBy(int directorId, FilmSort sortBy) {
+    public List<Film> get(int directorId, FilmSortType sortBy) {
         Optional<Director> director = directorStorage.get(directorId);
         if (director.isEmpty()) {
             String message = String.format("Режиссер с id = %d не найден.", directorId);
-            log.debug("FilmService getBy(int directorId, FilmSort sortBy): Режиссер с id = {} не найден.", directorId);
+            log.debug("get(int directorId, FilmSort sortBy): Режиссер с id = {} не найден.", directorId);
             throw new ObjectWasNotFoundException(message);
         }
-        List<Film> films = filmStorage.getBy(directorId, sortBy);
-        filmGenreStorage.setGenres(films);
-        directorStorage.setDirectors(films);
+        List<Film> films = filmStorage.get(directorId, sortBy);
+        filmGenreStorage.set(films);
+        directorStorage.set(films);
         return films;
     }
 
@@ -150,10 +138,10 @@ public class FilmService {
      * @return Созданный объект фильма
      */
     public Film add(Film film) {
-        mpaStorage.setMpa(film);
+        mpaStorage.set(film);
         Film newFilm = filmStorage.add(film);
-        filmGenreStorage.setGenres(Collections.singletonList(newFilm));
-        directorStorage.setDirectors(Collections.singletonList(newFilm));
+        filmGenreStorage.set(Collections.singletonList(newFilm));
+        directorStorage.set(Collections.singletonList(newFilm));
         return film;
     }
 
@@ -164,10 +152,10 @@ public class FilmService {
      * @return Изменённый объект фильма
      */
     public Film update(Film film) {
-        mpaStorage.setMpa(film);
+        mpaStorage.set(film);
         Film updatedFilm = filmStorage.update(film);
-        filmGenreStorage.setGenres(Collections.singletonList(updatedFilm));
-        directorStorage.setDirectors(Collections.singletonList(updatedFilm));
+        filmGenreStorage.set(Collections.singletonList(updatedFilm));
+        directorStorage.set(Collections.singletonList(updatedFilm));
         return film;
     }
 
@@ -178,8 +166,8 @@ public class FilmService {
      * @param userId id пользователя
      */
     public void addLike(Integer id, Integer userId) {
-        likeStorage.addLike(id, userId);
-        eventService.createEvent(userId, EventType.LIKE, Operation.ADD, id);
+        likeStorage.add(id, userId);
+        eventService.create(userId, EventType.LIKE, OperationType.ADD, id);
     }
 
     /**
@@ -189,8 +177,8 @@ public class FilmService {
      * @param userId id пользователя
      */
     public void removeLike(Integer id, Integer userId) {
-        likeStorage.removeLike(id, userId);
-        eventService.createEvent(userId, EventType.LIKE, Operation.REMOVE, id);
+        likeStorage.remove(id, userId);
+        eventService.create(userId, EventType.LIKE, OperationType.REMOVE, id);
     }
 
     /**
@@ -198,7 +186,7 @@ public class FilmService {
      *
      * @param id id фильма
      */
-    public void removeFilmById(Integer id) {
-        filmStorage.removeFilmById(id);
+    public void remove(Integer id) {
+        filmStorage.remove(id);
     }
 }

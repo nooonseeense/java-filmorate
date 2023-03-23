@@ -1,15 +1,14 @@
 package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.film.FilmStorage;
-import ru.application.filmorate.storage.friend.FriendStorage;
-import ru.application.filmorate.storage.user.UserStorage;
-import ru.application.filmorate.util.enumeration.EventType;
-import ru.application.filmorate.util.enumeration.Operation;
+import ru.application.filmorate.storage.FilmStorage;
+import ru.application.filmorate.storage.FriendStorage;
+import ru.application.filmorate.storage.UserStorage;
+import ru.application.filmorate.storage.util.enumeration.EventType;
+import ru.application.filmorate.storage.util.enumeration.OperationType;
 
 import java.util.List;
 
@@ -37,8 +36,8 @@ public class UserService {
      * @param userId id пользователя
      * @return Объект пользователя
      */
-    public User getById(Integer userId) {
-        return userStorage.getById(userId);
+    public User get(Integer userId) {
+        return userStorage.get(userId);
     }
 
     /**
@@ -59,7 +58,7 @@ public class UserService {
      * @return список друзей пользователя
      */
     public List<User> getListOfFriends(Integer id) {
-        userStorage.getById(id);
+        userStorage.get(id);
         return friendStorage.getListOfFriends(id);
     }
 
@@ -70,7 +69,7 @@ public class UserService {
      * @return Список фильмов
      */
     public List<Film> getRecommendations(Integer userId) {
-        validation(userStorage.getById(userId));
+        validation(userStorage.get(userId));
         return filmStorage.getRecommendedFilms(userId);
     }
 
@@ -104,7 +103,7 @@ public class UserService {
      */
     public void addFriends(Integer id, Integer friendId) {
         friendStorage.addFriends(id, friendId);
-        eventService.createEvent(id, EventType.FRIEND, Operation.ADD, friendId);
+        eventService.create(id, EventType.FRIEND, OperationType.ADD, friendId);
     }
 
     /**
@@ -115,7 +114,7 @@ public class UserService {
      */
     public void removeFriends(Integer id, Integer friendId) {
         friendStorage.removeFriends(id, friendId);
-        eventService.createEvent(id, EventType.FRIEND, Operation.REMOVE, friendId);
+        eventService.create(id, EventType.FRIEND, OperationType.REMOVE, friendId);
     }
 
     /**
@@ -123,8 +122,8 @@ public class UserService {
      *
      * @param id id пользователя
      */
-    public void removeUserById(Integer id) {
-        userStorage.removeUserById(id);
+    public void remove(Integer id) {
+        userStorage.remove(id);
     }
 
     /**

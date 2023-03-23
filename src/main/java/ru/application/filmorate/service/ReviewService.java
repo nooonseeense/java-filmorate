@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import ru.application.filmorate.exception.ObjectWasNotFoundException;
 import ru.application.filmorate.exception.ReviewValidationException;
 import ru.application.filmorate.model.Review;
-import ru.application.filmorate.storage.review.ReviewStorage;
-import ru.application.filmorate.util.enumeration.EventType;
-import ru.application.filmorate.util.enumeration.Operation;
+import ru.application.filmorate.storage.ReviewStorage;
+import ru.application.filmorate.storage.util.enumeration.EventType;
+import ru.application.filmorate.storage.util.enumeration.OperationType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +35,7 @@ public class ReviewService {
     public Review add(Review review) {
         validateReview(review);
         Review addedReview = reviewStorage.add(review);
-        eventService.createEvent(addedReview.getUserId(), EventType.REVIEW, Operation.ADD, addedReview.getReviewId());
+        eventService.create(addedReview.getUserId(), EventType.REVIEW, OperationType.ADD, addedReview.getReviewId());
         return addedReview;
     }
 
@@ -48,7 +48,7 @@ public class ReviewService {
     public Review update(Review review) {
         validateReview(review);
         Review updatedReview = reviewStorage.update(review);
-        eventService.createEvent(updatedReview.getUserId(), EventType.REVIEW, Operation.UPDATE, updatedReview.getReviewId());
+        eventService.create(updatedReview.getUserId(), EventType.REVIEW, OperationType.UPDATE, updatedReview.getReviewId());
         return updatedReview;
     }
 
@@ -58,11 +58,11 @@ public class ReviewService {
      * @param reviewId id отзыва
      * @return Объект отзыва
      */
-    public Review getById(Integer reviewId) {
+    public Review get(Integer reviewId) {
         try {
-            return reviewStorage.getById(reviewId);
+            return reviewStorage.get(reviewId);
         } catch (EmptyResultDataAccessException e) {
-            log.debug("ReviewService getById(Integer reviewId): Отзыв с идентификатором {} не найден.", reviewId);
+            log.debug("get(Integer reviewId): Отзыв с идентификатором {} не найден.", reviewId);
             throw new ObjectWasNotFoundException(String.format("Отзыв с идентификатором %d не найден.", reviewId));
         }
     }
@@ -73,9 +73,9 @@ public class ReviewService {
      * @param reviewId id отзыва
      */
     public void delete(Integer reviewId) {
-        Review deletedReview = getById(reviewId);
+        Review review = get(reviewId);
         reviewStorage.delete(reviewId);
-        eventService.createEvent(deletedReview.getUserId(), EventType.REVIEW, Operation.REMOVE, deletedReview.getReviewId());
+        eventService.create(review.getUserId(), EventType.REVIEW, OperationType.REMOVE, review.getReviewId());
     }
 
     /**
@@ -85,10 +85,10 @@ public class ReviewService {
      * @param count  Количество отзывов в списке
      * @return Список с отзывами по ID фильма
      */
-    public List<Review> getAllByFilm(Integer filmId, Integer count) {
+    public List<Review> get(Integer filmId, Integer count) {
         List<Review> reviews;
         if (filmId == null) {
-            reviews = reviewStorage.getAll();
+            reviews = reviewStorage.get();
         } else {
             reviews = reviewStorage.getAllByFilm(filmId);
         }
@@ -109,7 +109,7 @@ public class ReviewService {
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isPresent()) {
             if (isLike.get()) {
-                log.debug("ReviewService addLike(Integer reviewId, Integer userId): У отзыва с id = {} уже есть лайк от " +
+                log.debug("addLike(Integer reviewId, Integer userId): У отзыва с id = {} уже есть лайк от " +
                         "пользователя с id = {}.", reviewId, userId);
                 throw new ReviewValidationException(String.format("У отзыва с id: %s уже есть лайк " +
                         "от пользователя с id: %s.", reviewId, userId));
@@ -133,7 +133,7 @@ public class ReviewService {
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isPresent()) {
             if (!isLike.get()) {
-                log.debug("ReviewService addDislike(Integer reviewId, Integer userId): У отзыва с id = {} уже есть дизлайк от " +
+                log.debug("addDislike(Integer reviewId, Integer userId): У отзыва с id = {} уже есть дизлайк от " +
                         "пользователя с id = {}.", reviewId, userId);
                 throw new ReviewValidationException(String.format("У отзыва с id: %s уже есть дизлайк " +
                         "от пользователя с id: %s.", reviewId, userId));
@@ -156,7 +156,7 @@ public class ReviewService {
         validateReviewAndUser(reviewId, userId);
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isEmpty()) {
-            log.debug("ReviewService deleteLike(Integer reviewId, Integer userId): У отзыва с id: {} нет лайка " +
+            log.debug("deleteLike(Integer reviewId, Integer userId): У отзыва с id: {} нет лайка " +
                     "от пользователя с id: {}.", reviewId, userId);
             throw new ReviewValidationException(String.format("У отзыва с id: %s нет лайка " +
                     "от пользователя с id: %s.", reviewId, userId));
@@ -176,7 +176,7 @@ public class ReviewService {
         validateReviewAndUser(reviewId, userId);
         Optional<Boolean> isLike = reviewStorage.isLike(reviewId, userId);
         if (isLike.isEmpty()) {
-            log.debug("ReviewService deleteDislike(Integer reviewId, Integer userId): У отзыва с id: {} нет дизлайка " +
+            log.debug("deleteDislike(Integer reviewId, Integer userId): У отзыва с id: {} нет дизлайка " +
                     "от пользователя с id: {}.", reviewId, userId);
             throw new ReviewValidationException(String.format("У отзыва с id: %s нет дизлайка " +
                     "от пользователя с id: %s.", reviewId, userId));
@@ -192,8 +192,8 @@ public class ReviewService {
      * @param review Объект отзыва
      */
     private void validateReview(Review review) {
-        filmService.getById(review.getFilmId());
-        userService.getById(review.getUserId());
+        filmService.get(review.getFilmId());
+        userService.get(review.getUserId());
     }
 
     /**
@@ -203,7 +203,7 @@ public class ReviewService {
      * @param userId   id пользователя
      */
     private void validateReviewAndUser(Integer reviewId, Integer userId) {
-        getById(reviewId);
-        userService.getById(userId);
+        get(reviewId);
+        userService.get(userId);
     }
 }
