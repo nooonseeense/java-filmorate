@@ -30,12 +30,12 @@ public class MpaDao implements MpaStorage {
         try {
             Mpa mpa = jdbcTemplate.queryForObject("SELECT ID, NAME FROM MPA WHERE ID = ?", Mapper::mpaMapper, id);
             if (mpa != null) {
-                log.info("Получен MPA-рейтинг: id = {}, название = {}", mpa.getId(), mpa.getName());
+                log.info("Получен MPA-рейтинг: ID = {}, название = {}", mpa.getId(), mpa.getName());
             }
             return mpa;
         } catch (EmptyResultDataAccessException e) {
-            String message = String.format("MPA-рейтинг с id = %d не найден.", id);
-            log.debug("get(int id): MPA-рейтинг с id = {} не найден.", id);
+            String message = String.format("MPA-рейтинг с ID = %d не найден.", id);
+            log.debug("get(int id): MPA-рейтинг с ID = {} не найден.", id);
             throw new ObjectDoesNotExist(message);
         }
     }

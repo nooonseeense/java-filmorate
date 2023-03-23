@@ -1,4 +1,4 @@
-package ru.application.filmorate.storage.util.enumeration;
+package ru.application.filmorate.enumeration;
 
 public enum EventType {
     LIKE,

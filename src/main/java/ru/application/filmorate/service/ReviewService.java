@@ -8,8 +8,8 @@ import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.exception.ReviewValidationException;
 import ru.application.filmorate.model.Review;
 import ru.application.filmorate.storage.ReviewStorage;
-import ru.application.filmorate.storage.util.enumeration.EventType;
-import ru.application.filmorate.storage.util.enumeration.OperationType;
+import ru.application.filmorate.enumeration.EventType;
+import ru.application.filmorate.enumeration.OperationType;
 
 import java.util.Comparator;
 import java.util.List;

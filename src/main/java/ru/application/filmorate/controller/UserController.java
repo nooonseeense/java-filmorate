@@ -36,11 +36,11 @@ public class UserController {
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
-    public List<User> getListOfFriendsSharedWithAnotherUser(@PositiveOrZero @PathVariable Integer id,
+    public List<User> getCommonFriends(@PositiveOrZero @PathVariable Integer id,
                                                             @PositiveOrZero @PathVariable Integer otherId) {
         log.info("Запрос GET: getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) на получение списка" +
                 " общих друзей по ID = {} первого пользователя и ID = {} второго пользователя.", id, otherId);
-        return userService.getListOfFriendsSharedWithAnotherUser(id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 
     @GetMapping("{id}/friends")

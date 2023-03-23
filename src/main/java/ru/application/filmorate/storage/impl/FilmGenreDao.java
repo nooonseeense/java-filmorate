@@ -27,8 +27,8 @@ public class FilmGenreDao implements FilmGenreStorage {
     public List<Genre> get(int id) {
         return jdbcTemplate.query(
                 "SELECT g.ID, g.NAME " +
-                "FROM FILM_GENRE AS fg " +
-                "LEFT JOIN GENRE AS g ON fg.GENRE_ID = g.ID " +
+                "FROM FILM_GENRE fg " +
+                "LEFT JOIN GENRE g ON fg.GENRE_ID = g.ID " +
                 "WHERE fg.FILM_ID = ?",
                 Mapper::genreMapper, id
         );
@@ -43,7 +43,7 @@ public class FilmGenreDao implements FilmGenreStorage {
             SqlRowSet set = namedJdbcTemplate.queryForRowSet(
                     "SELECT FILM_ID, g.* " +
                     "FROM FILM_GENRE " +
-                    "JOIN GENRE AS g ON g.ID = FILM_GENRE.GENRE_ID " +
+                    "JOIN GENRE g ON g.ID = FILM_GENRE.GENRE_ID " +
                     "WHERE FILM_GENRE.FILM_ID IN (:filmsId)",
                     source
             );

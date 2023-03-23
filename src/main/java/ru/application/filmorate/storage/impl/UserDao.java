@@ -33,18 +33,20 @@ public class UserDao implements UserStorage {
     public User get(Integer userId) {
         try {
             User user = jdbcTemplate.queryForObject(
-                    "SELECT id, email, login, name, birthday " +
-                    "FROM users " +
-                    "WHERE id = ?",
+                    "SELECT ID, EMAIL, LOGIN, NAME, BIRTHDAY " +
+                    "FROM USERS " +
+                    "WHERE ID = ?",
                     Mapper::userMapper, userId
             );
+
             if (user != null) {
-                log.info("Найден пользователь: c id = {} именем = {}", user.getId(), user.getName());
+                log.info("Найден пользователь: c ID = {} именем = {}", user.getId(), user.getName());
             }
+
             return user;
         } catch (EmptyResultDataAccessException e) {
-            String message = String.format("Пользователь с id = %d не найден.", userId);
-            log.debug("getById(Integer userId): Пользователь с id = {} не найден.", userId);
+            String message = String.format("Пользователь с ID = %d не найден.", userId);
+            log.debug("get(Integer userId): Пользователь с ID = {} не найден.", userId);
             throw new ObjectDoesNotExist(message);
         }
     }
@@ -79,8 +81,8 @@ public class UserDao implements UserStorage {
                 user.getId()
         );
         if (updateRows == 0) {
-            String message = String.format("Пользователь с идентификатором %d не найден.", user.getId());
-            log.debug("update(User user): Пользователь с идентификатором {} не найден.", user.getId());
+            String message = String.format("Пользователь с ID %d не найден.", user.getId());
+            log.debug("update(User user): Пользователь с ID {} не найден.", user.getId());
             throw new ObjectDoesNotExist(message);
         } else {
             return user;
@@ -90,8 +92,8 @@ public class UserDao implements UserStorage {
     @Override
     public void remove(Integer id) {
         if (jdbcTemplate.update("DELETE FROM USERS WHERE ID = ? ", id) == 0) {
-            String message = String.format("Пользователь с id = %d не найден.", id);
-            log.debug("removeUserById(Integer id): Пользователь с id = {} не найден.", id);
+            String message = String.format("Пользователь с ID = %d не найден.", id);
+            log.debug("removeUserById(Integer id): Пользователь с ID = {} не найден.", id);
             throw new ObjectDoesNotExist(message);
         }
     }

@@ -46,8 +46,8 @@ public class ReviewDao implements ReviewStorage {
     @Override
     public Review get(Integer reviewId) {
         return jdbcTemplate.queryForObject(
-                "SELECT R.ID, R.CONTENT, R.IS_POSITIVE, R.USER_ID, R.FILM_ID, R.USEFUL " +
-                "FROM REVIEW R " +
+                "SELECT ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, USEFUL " +
+                "FROM REVIEW " +
                 "WHERE ID = ?",
                 Mapper::reviewMapper, reviewId
         );
@@ -76,8 +76,8 @@ public class ReviewDao implements ReviewStorage {
     @Override
     public List<Review> get() {
         return jdbcTemplate.query(
-                "SELECT R.ID, R.CONTENT, R.IS_POSITIVE, R.USER_ID, R.FILM_ID, R.USEFUL " +
-                "FROM REVIEW R",
+                "SELECT ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, USEFUL " +
+                "FROM REVIEW",
                 Mapper::reviewMapper
         );
     }
@@ -85,8 +85,8 @@ public class ReviewDao implements ReviewStorage {
     @Override
     public List<Review> getAllByFilm(Integer filmId) {
         return jdbcTemplate.query(
-                "SELECT R.ID, R.CONTENT, R.IS_POSITIVE, R.USER_ID, R.FILM_ID, R.USEFUL " +
-                "FROM REVIEW R " +
+                "SELECT ID, CONTENT, IS_POSITIVE, USER_ID, FILM_ID, USEFUL " +
+                "FROM REVIEW " +
                 "WHERE FILM_ID = ?",
                 Mapper::reviewMapper, filmId
         );
@@ -141,9 +141,7 @@ public class ReviewDao implements ReviewStorage {
     @Override
     public void recalculateUseful(Integer reviewId) {
         Integer reviewUseful = getReviewUseful(reviewId);
-        String sql = "UPDATE REVIEW SET USEFUL = ? " +
-                "WHERE ID = ?";
-        jdbcTemplate.update(sql, reviewUseful, reviewId);
+        jdbcTemplate.update("UPDATE REVIEW SET USEFUL = ? WHERE ID = ?", reviewUseful, reviewId);
     }
 
     @Override
@@ -158,12 +156,13 @@ public class ReviewDao implements ReviewStorage {
      * @return расчитывает текущую полезность отзыва
      */
     private Integer getReviewUseful(Integer reviewId) {
-        String sql = "SELECT * FROM REVIEW_RATING WHERE REVIEW_ID = ?";
         List<Boolean> useful = new ArrayList<>();
-        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, reviewId);
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet("SELECT * FROM REVIEW_RATING WHERE REVIEW_ID = ?", reviewId);
+
         while (sqlRowSet.next()) {
             useful.add(sqlRowSet.getBoolean("is_positive"));
         }
+
         return Math.toIntExact(useful.stream().filter(p -> p).count() - useful.stream().filter(p -> !p).count());
     }
 }

@@ -11,7 +11,7 @@ public interface FriendStorage {
      * @param id       id первого пользователя
      * @param friendId id второго пользователя
      */
-    void addFriends(Integer id, Integer friendId);
+    void add(Integer id, Integer friendId);
 
     /**
      * Метод удаления пользователя из друзей
@@ -19,7 +19,7 @@ public interface FriendStorage {
      * @param id       id первого пользователя
      * @param friendId id второго пользователя
      */
-    void removeFriends(Integer id, Integer friendId);
+    void remove(Integer id, Integer friendId);
 
     /**
      * Метод получения общих друзей двух пользователей
@@ -28,7 +28,7 @@ public interface FriendStorage {
      * @param otherId id второго пользователя
      * @return Список общих друзей двух пользователей
      */
-    List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId);
+    List<User> getCommonFriends(Integer id, Integer otherId);
 
     /**
      * Метод получения списка друзей пользователя по id
@@ -36,5 +36,5 @@ public interface FriendStorage {
      * @param id id пользователя
      * @return список друзей пользователя
      */
-    List<User> getListOfFriends(Integer id);
+    List<User> getFriends(Integer id);
 }

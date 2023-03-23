@@ -5,9 +5,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.Event;
 import ru.application.filmorate.storage.EventStorage;
-import ru.application.filmorate.storage.UserStorage;
-import ru.application.filmorate.storage.util.enumeration.EventType;
-import ru.application.filmorate.storage.util.enumeration.OperationType;
+import ru.application.filmorate.enumeration.EventType;
+import ru.application.filmorate.enumeration.OperationType;
 
 import java.sql.Timestamp;
 import java.time.Instant;

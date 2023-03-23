@@ -9,16 +9,16 @@ import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.storage.*;
-import ru.application.filmorate.storage.util.enumeration.EventType;
-import ru.application.filmorate.storage.util.enumeration.FilmSortType;
-import ru.application.filmorate.storage.util.enumeration.OperationType;
+import ru.application.filmorate.enumeration.EventType;
+import ru.application.filmorate.enumeration.FilmSortType;
+import ru.application.filmorate.enumeration.OperationType;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static ru.application.filmorate.storage.util.constant.Constants.SAMPLE;
+import static ru.application.filmorate.constant.Constants.SAMPLE;
 
 @Slf4j
 @Service
@@ -70,8 +70,8 @@ public class FilmService {
      * @param year    Запрашиваемый год
      * @return Список фильмов
      */
-    public List<Film> getPopularMoviesByLikes(Integer count, Integer genreId, Short year) {
-        List<Film> films = filmStorage.getPopularMoviesByLikes(count, genreId, year);
+    public List<Film> getPopularMovies(Integer count, Integer genreId, Short year) {
+        List<Film> films = filmStorage.getPopularMovies(count, genreId, year);
         filmGenreStorage.set(films);
         directorStorage.set(films);
         return films;
@@ -84,13 +84,13 @@ public class FilmService {
      * @param by    может принимать значения director (поиск по режиссёру), title (поиск по названию)
      * @return Список фильмов
      */
-    public List<Film> getPopularMoviesFromAdvancedSearch(String query, String by) {
+    public List<Film> getPopularMovies(String query, String by) {
         if (!SAMPLE.contains(by)) {
             log.debug("getPopularMoviesFromAdvancedSearch(String query, String by): " +
                     "Некорректное значение выборки поиска в поле BY = {}", by);
             throw new IllegalArgumentException("Некорректное значение выборки поиска");
         }
-        List<Film> films = filmStorage.getPopularMoviesFromAdvancedSearch(query, by);
+        List<Film> films = filmStorage.getPopularMovies(query, by);
         filmGenreStorage.set(films);
         directorStorage.set(films);
         return films;

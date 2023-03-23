@@ -39,10 +39,17 @@ public class ErrorHandler {
         return Map.of(ERROR, e.getMessage());
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
+    @ExceptionHandler({NullPointerException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleNullOrIllegalArgumentEx(final RuntimeException e) {
         log.warn("Сервер столкнулся с неожиданной ошибкой, которая помешала выполнить запрос.");
+        return Map.of(ERROR, e.getMessage());
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleIllegalArgumentEx(final RuntimeException e) {
+        log.warn("Некорректное значение.");
         return Map.of(ERROR, e.getMessage());
     }
 
