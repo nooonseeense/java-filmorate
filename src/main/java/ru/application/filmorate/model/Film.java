@@ -13,7 +13,6 @@ import java.util.LinkedHashSet;
 @Builder
 @AllArgsConstructor
 public class Film {
-
     private int id;
     @NotBlank(message = "Название не может быть пустым.")
     private final String name;

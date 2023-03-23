@@ -6,14 +6,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.service.FilmService;
-import ru.application.filmorate.util.enumeration.FilmSort;
+import ru.application.filmorate.storage.util.enumeration.FilmSortType;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.application.filmorate.util.Constants.UNKNOWN;
+import static ru.application.filmorate.storage.util.constant.Constants.UNKNOWN;
 
 @Validated
 @RestController
@@ -30,9 +30,9 @@ public class FilmController {
     }
 
     @GetMapping("{filmId}")
-    public Film getById(@PositiveOrZero @PathVariable Integer filmId) {
-        log.info("Запрос GET: getById(Integer filmId) на получение фильма по ID = {}.", filmId);
-        return filmService.getById(filmId);
+    public Film get(@PositiveOrZero @PathVariable Integer filmId) {
+        log.info("Запрос GET: get(Integer filmId) на получение фильма по ID = {}.", filmId);
+        return filmService.get(filmId);
     }
 
     @GetMapping("/popular")
@@ -61,11 +61,11 @@ public class FilmController {
     }
 
     @GetMapping("/director/{directorId}")
-    public List<Film> getBy(@PathVariable Integer directorId,
-                            @RequestParam FilmSort sortBy) {
-        log.info("Запрос GET: getBy(Integer directorId, FilmSort sortBy) на получение списка фильмов " +
+    public List<Film> get(@PathVariable Integer directorId,
+                          @RequestParam FilmSortType sortBy) {
+        log.info("Запрос GET: get(Integer directorId, FilmSort sortBy) на получение списка фильмов " +
                 "режиссера ID = {}, SORT BY = {}.", directorId, sortBy);
-        return filmService.getBy(directorId, sortBy);
+        return filmService.get(directorId, sortBy);
     }
 
     @PostMapping
@@ -99,6 +99,6 @@ public class FilmController {
     @DeleteMapping("{filmId}")
     public void removeFilm(@PositiveOrZero @PathVariable Integer filmId) {
         log.info("Запрос DELETE: removeFilm(Integer filmId) на удаление фильма {}.", filmId);
-        filmService.removeFilmById(filmId);
+        filmService.remove(filmId);
     }
 }

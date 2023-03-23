@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.application.filmorate.model.User;
-import ru.application.filmorate.storage.user.UserStorageDao;
+import ru.application.filmorate.storage.impl.UserDao;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorageDaoTest {
-    private final UserStorageDao userStorageDao;
+    private final UserDao userDao;
 
     @Test
     @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -32,7 +32,7 @@ public class UserDbStorageDaoTest {
                 .birthday(LocalDate.of(2021, 10, 10))
                 .build();
 
-        User userActual = userStorageDao.getById(userExpected.getId());
+        User userActual = userDao.get(userExpected.getId());
 
         assertEquals(userExpected.getId(), userActual.getId());
         assertEquals(userExpected.getEmail(), userActual.getEmail());
@@ -52,8 +52,8 @@ public class UserDbStorageDaoTest {
                 .birthday(LocalDate.of(2021, 10, 10))
                 .build();
 
-        userStorageDao.create(user);
-        User userActual = userStorageDao.getById(user.getId());
+        userDao.create(user);
+        User userActual = userDao.get(user.getId());
 
         assertEquals(user.getId(), userActual.getId());
         assertEquals(user.getEmail(), userActual.getEmail());
@@ -82,7 +82,7 @@ public class UserDbStorageDaoTest {
                 .birthday(LocalDate.of(2020, 10, 10))
                 .build();
 
-        List<User> actualList = userStorageDao.get();
+        List<User> actualList = userDao.get();
 
         assertEquals(user.getId(), actualList.get(0).getId());
         assertEquals(user.getEmail(), actualList.get(0).getEmail());
@@ -109,8 +109,8 @@ public class UserDbStorageDaoTest {
                 .birthday(LocalDate.of(2022, 11, 11))
                 .build();
 
-        userStorageDao.update(user);
-        User actualUser = userStorageDao.getById(user.getId());
+        userDao.update(user);
+        User actualUser = userDao.get(user.getId());
 
         assertEquals(user.getId(), actualUser.getId());
         assertEquals(user.getEmail(), actualUser.getEmail());
