@@ -17,7 +17,7 @@ import java.util.List;
 public class FriendDao implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public void addFriends(Integer id, Integer friendId) {
+    public void add(Integer id, Integer friendId) {
         try {
             jdbcTemplate.update("INSERT INTO FRIEND(USER1_ID, USER2_ID) VALUES (?, ?)", id, friendId);
             log.info("addFriends(Integer id, Integer friendId): Пользователь с id = {} и id = {} стали друзьями.",
@@ -30,30 +30,30 @@ public class FriendDao implements FriendStorage {
         }
     }
 
-    public void removeFriends(Integer id, Integer friendId) {
+    public void remove(Integer id, Integer friendId) {
         jdbcTemplate.update(
-                "MERGE INTO FRIEND AS f USING (VALUES (?,?)) S(user1, user2)\n" +
-                "ON f.user1_ID = S.user1 AND f.user2_ID = S.user2 \n" +
+                "MERGE INTO FRIEND f USING (VALUES (?,?)) S(user1, user2) " +
+                "ON f.USER1_ID = S.user1 AND f.USER2_ID = S.user2 " +
                 "WHEN MATCHED THEN DELETE",
                 id, friendId
         );
     }
 
     @Override
-    public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
+    public List<User> getCommonFriends(Integer id, Integer otherId) {
         return jdbcTemplate.query(
-                "SELECT * FROM USERS AS u, FRIEND AS f, FRIEND o " +
+                "SELECT * FROM USERS u, FRIEND f, FRIEND o " +
                 "WHERE u.ID = f.USER2_ID AND u.ID = o.USER2_ID AND f.USER1_ID = ? AND o.USER1_ID = ?",
                 Mapper::userMapper, id, otherId
         );
     }
 
     @Override
-    public List<User> getListOfFriends(Integer id) {
+    public List<User> getFriends(Integer id) {
         return jdbcTemplate.query(
-                "SELECT U.ID, U.EMAIL, U.LOGIN, U.NAME, U.BIRTHDAY " +
-                "FROM FRIEND AS F " +
-                "LEFT JOIN USERS AS U ON F.USER2_ID = U.ID " +
+                "SELECT u.ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY " +
+                "FROM FRIEND f " +
+                "LEFT JOIN USERS u ON f.USER2_ID = u.ID " +
                 "WHERE USER1_ID = ?",
                 Mapper::userMapper, id
         );

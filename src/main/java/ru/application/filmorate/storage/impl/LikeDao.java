@@ -16,10 +16,10 @@ public class LikeDao implements LikeStorage {
     @Override
     public void add(int id, int userId) {
         try {
-            jdbcTemplate.update("INSERT INTO LIKE_FILM (film_id, user_id) VALUES (?,?)", id, userId);
+            jdbcTemplate.update("INSERT INTO LIKE_FILM (FILM_ID, USER_ID) VALUES (?,?)", id, userId);
         } catch (ObjectDoesNotExist e) {
-            String message = String.format("Фильм с id = %d или пользователь с id = %d не найден.", id, userId);
-            log.debug("addLike(int id, int userId): Фильм с id = {} или пользователь с id = {} не найден.",
+            String message = String.format("Фильм с ID = %d или пользователь с id = %d не найден.", id, userId);
+            log.debug("addLike(int id, int userId): Фильм с ID = {} или пользователь с ID = {} не найден.",
                     id, userId);
             throw new ObjectDoesNotExist(message);
         }
@@ -30,8 +30,8 @@ public class LikeDao implements LikeStorage {
         try {
             jdbcTemplate.update("DELETE FROM LIKE_FILM WHERE FILM_ID = ? AND USER_ID = ?", id, userId);
         } catch (ObjectDoesNotExist e) {
-            String message = String.format("Фильм с id = %d или Пользователь с id = %d не найден.", id, userId);
-            log.debug("removeLike(int id, int userId): Фильм с id = {} или пользователь с id = {} не найден.",
+            String message = String.format("Фильм с ID = %d или Пользователь с ID = %d не найден.", id, userId);
+            log.debug("removeLike(int id, int userId): Фильм с ID = {} или пользователь с ID = {} не найден.",
                     id, userId);
             throw new ObjectDoesNotExist(message);
         }

@@ -9,8 +9,8 @@ import ru.application.filmorate.model.User;
 import ru.application.filmorate.storage.FilmStorage;
 import ru.application.filmorate.storage.FriendStorage;
 import ru.application.filmorate.storage.UserStorage;
-import ru.application.filmorate.storage.util.enumeration.EventType;
-import ru.application.filmorate.storage.util.enumeration.OperationType;
+import ru.application.filmorate.enumeration.EventType;
+import ru.application.filmorate.enumeration.OperationType;
 
 import java.util.List;
 
@@ -49,8 +49,8 @@ public class UserService {
      * @param otherId id второго пользователя
      * @return Список общих друзей двух пользователей
      */
-    public List<User> getListOfFriendsSharedWithAnotherUser(Integer id, Integer otherId) {
-        return friendStorage.getListOfFriendsSharedWithAnotherUser(id, otherId);
+    public List<User> getCommonFriends(Integer id, Integer otherId) {
+        return friendStorage.getCommonFriends(id, otherId);
     }
 
     /**
@@ -61,7 +61,7 @@ public class UserService {
      */
     public List<User> getListOfFriends(Integer id) {
         exists(id);
-        return friendStorage.getListOfFriends(id);
+        return friendStorage.getFriends(id);
     }
 
     /**
@@ -104,7 +104,7 @@ public class UserService {
      * @param friendId id второго пользователя
      */
     public void addFriends(Integer id, Integer friendId) {
-        friendStorage.addFriends(id, friendId);
+        friendStorage.add(id, friendId);
         eventService.create(id, EventType.FRIEND, OperationType.ADD, friendId);
     }
 
@@ -115,7 +115,7 @@ public class UserService {
      * @param friendId id второго пользователя
      */
     public void removeFriends(Integer id, Integer friendId) {
-        friendStorage.removeFriends(id, friendId);
+        friendStorage.remove(id, friendId);
         eventService.create(id, EventType.FRIEND, OperationType.REMOVE, friendId);
     }
 

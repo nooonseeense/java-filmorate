@@ -1,8 +1,8 @@
 package ru.application.filmorate.storage.util;
 
 import ru.application.filmorate.model.*;
-import ru.application.filmorate.storage.util.enumeration.EventType;
-import ru.application.filmorate.storage.util.enumeration.OperationType;
+import ru.application.filmorate.enumeration.EventType;
+import ru.application.filmorate.enumeration.OperationType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -139,7 +139,7 @@ public class FilmDaoTest {
     @Test
     @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "file:src/test/resources/data-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void shouldReturnPopularMoviesByLikes() {
+    public void shouldReturnPopularMovies() {
         Film filmExpected = Film.builder()
                 .id(1)
                 .name("Film1")
@@ -149,7 +149,7 @@ public class FilmDaoTest {
                 .mpa(new Mpa(1, "G"))
                 .build();
 
-        Film actualFilm = filmController.getPopularMoviesByLikes(1,null,null).get(0);
+        Film actualFilm = filmController.getPopularMovies(1,null,null).get(0);
 
         assertEquals(filmExpected.getId(), actualFilm.getId());
         assertEquals(filmExpected.getName(), actualFilm.getName());

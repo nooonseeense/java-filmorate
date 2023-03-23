@@ -6,14 +6,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.service.FilmService;
-import ru.application.filmorate.storage.util.enumeration.FilmSortType;
+import ru.application.filmorate.enumeration.FilmSortType;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-import static ru.application.filmorate.storage.util.constant.Constants.UNKNOWN;
+import static ru.application.filmorate.constant.Constants.UNKNOWN;
 
 @Validated
 @RestController
@@ -36,21 +36,21 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularMoviesByLikes(@Positive @RequestParam(defaultValue = "10") Integer count,
+    public List<Film> getPopularMovies(@Positive @RequestParam(defaultValue = "10") Integer count,
                                               @RequestParam(required = false) Integer genreId,
                                               @RequestParam(required = false) Short year) {
         log.info("Запрос GET: getPopularMoviesByLikes(Integer count, Integer genreId, Short year) на получение списка " +
                 "популярных фильмов с параметрами: COUNT = {}, GENRE ID = {}, YEAR = {}.", count, genreId, year);
-        return filmService.getPopularMoviesByLikes(count, genreId, year);
+        return filmService.getPopularMovies(count, genreId, year);
     }
 
     @GetMapping("/search")
-    public List<Film> getPopularMoviesFromAdvancedSearch(
+    public List<Film> getPopularMovies(
             @RequestParam(value = "query", defaultValue = UNKNOWN) String query,
             @RequestParam(value = "by", defaultValue = UNKNOWN) String by) {
         log.info("Запрос GET: getPopularMoviesFromAdvancedSearch(String query, String by) на получение списка " +
                 "популярных фильмов расширенного поиска параметрами: QUERY = {}, BY = {}.", query, by);
-        return filmService.getPopularMoviesFromAdvancedSearch(query, by);
+        return filmService.getPopularMovies(query, by);
     }
 
     @GetMapping("/common")

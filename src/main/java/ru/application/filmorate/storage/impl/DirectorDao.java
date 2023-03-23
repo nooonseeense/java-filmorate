@@ -2,6 +2,7 @@ package ru.application.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -38,13 +39,20 @@ public class DirectorDao implements DirectorStorage {
 
     @Override
     public Optional<Director> get(Integer id) {
-        String sql = "SELECT * FROM DIRECTOR WHERE ID = ?";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, id);
-        if (!rs.next()) {
-            return Optional.empty();
+        try {
+            Director director = jdbcTemplate.queryForObject("SELECT * " +
+                    "FROM DIRECTOR WHERE ID = ?", Mapper::directorMapper, id);
+
+            if (director != null) {
+                log.info("Найден режиссер: c ID = {} именем = {}", director.getId(), director.getName());
+            }
+
+            return Optional.ofNullable(director);
+        } catch (EmptyResultDataAccessException e) {
+            String message = String.format("Режиссер с ID = %d не найден.", id);
+            log.debug("get(Integer id): режиссер с ID = {} не найден.", id);
+            throw new ObjectDoesNotExist(message);
         }
-        Director director = jdbcTemplate.queryForObject(sql, Mapper::directorMapper, id);
-        return Optional.ofNullable(director);
     }
 
     @Override
@@ -80,8 +88,8 @@ public class DirectorDao implements DirectorStorage {
     public void delete(int id) {
         int result = jdbcTemplate.update("DELETE FROM DIRECTOR WHERE ID = ?", id);
         if (result == 0) {
-            String message = "Режиссер с id = " + id + " не найден.";
-            log.debug("delete(int id): Режиссер с id = {} не найден.", id);
+            String message = "Режиссер с ID = " + id + " не найден.";
+            log.debug("delete(int id): Режиссер с ID = {} не найден.", id);
             throw new ObjectDoesNotExist(message);
         }
     }
@@ -94,9 +102,9 @@ public class DirectorDao implements DirectorStorage {
             SqlParameterSource source = new MapSqlParameterSource("filmsId", filmsId);
             SqlRowSet set = namedJdbcTemplate.queryForRowSet(
                     "SELECT FILM_ID, d.* " +
-                    "FROM FILM_DIRECTOR " +
-                    "JOIN DIRECTOR AS d ON d.ID = FILM_DIRECTOR.DIRECTOR_ID " +
-                    "WHERE FILM_DIRECTOR.FILM_ID IN (:filmsId)",
+                    "FROM FILM_DIRECTOR AS fd " +
+                    "JOIN DIRECTOR AS d ON d.ID = fd.DIRECTOR_ID " +
+                    "WHERE fd.FILM_ID IN (:filmsId)",
                     source
             );
             while (set.next()) {

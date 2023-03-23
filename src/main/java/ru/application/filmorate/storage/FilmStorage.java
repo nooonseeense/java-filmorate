@@ -1,7 +1,7 @@
 package ru.application.filmorate.storage;
 
 import ru.application.filmorate.model.Film;
-import ru.application.filmorate.storage.util.enumeration.FilmSortType;
+import ru.application.filmorate.enumeration.FilmSortType;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public interface FilmStorage {
      * @param by    может принимать значения director (поиск по режиссёру), title (поиск по названию)
      * @return Список фильмов
      */
-    List<Film> getPopularMoviesFromAdvancedSearch(String query, String by);
+    List<Film> getPopularMovies(String query, String by);
 
     /**
      * Метод получения списка популярных фильмов по жанру и году
@@ -38,7 +38,7 @@ public interface FilmStorage {
      * @param year    Запрашиваемый год
      * @return Список фильмов
      */
-    List<Film> getPopularMoviesByLikes(Integer count, Integer genreId, Short year);
+    List<Film> getPopularMovies(Integer count, Integer genreId, Short year);
 
     /**
      * Метод получения списка общих фильмов

@@ -20,22 +20,23 @@ public class GenreDao implements GenreStorage {
 
     @Override
     public List<Genre> get() {
-        return jdbcTemplate.query("SELECT id, name FROM genre", Mapper::genreMapper);
+        return jdbcTemplate.query("SELECT ID, NAME FROM GENRE", Mapper::genreMapper);
     }
 
     @Override
     public Genre get(int id) {
         try {
-            Genre genre = jdbcTemplate.queryForObject("SELECT id, name FROM genre WHERE id = ?",
+            Genre genre = jdbcTemplate.queryForObject("SELECT ID, NAME FROM GENRE WHERE ID = ?",
                     Mapper::genreMapper, id
             );
+
             if (genre != null) {
-                log.info("Получен жанр: id = {}, название = {}", genre.getId(), genre.getName());
+                log.info("Получен жанр: ID = {}, название = {}", genre.getId(), genre.getName());
             }
             return genre;
         } catch (EmptyResultDataAccessException e) {
-            String message = "Жанр с id = " + id + " не найден.";
-            log.debug("get(int id): Жанр с id = {} не найден.", id);
+            String message = "Жанр с ID = " + id + " не найден.";
+            log.debug("get(int id): Жанр с ID = {} не найден.", id);
             throw new ObjectDoesNotExist(message);
         }
     }
