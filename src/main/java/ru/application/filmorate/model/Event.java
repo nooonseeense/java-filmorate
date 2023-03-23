@@ -18,6 +18,6 @@ public class Event {
     Timestamp timestamp;
     int userId;
     EventType eventType;
-    OperationType operationType;
+    OperationType operation;
     int entityId;
 }

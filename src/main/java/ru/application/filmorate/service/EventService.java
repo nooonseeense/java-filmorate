@@ -34,15 +34,15 @@ public class EventService {
      *
      * @param userId    id пользователя
      * @param eventType Тип события
-     * @param operationType Тип операции
+     * @param operation Тип операции
      * @param entityId  Идентификатор сущности, с которой произошло событие
      */
-    public void create(int userId, EventType eventType, OperationType operationType, int entityId) {
+    public void create(int userId, EventType eventType, OperationType operation, int entityId) {
         Event event = Event.builder()
                 .timestamp(Timestamp.from(Instant.now()))
                 .userId(userId)
                 .eventType(eventType)
-                .operationType(operationType)
+                .operation(operation)
                 .entityId(entityId)
                 .build();
 

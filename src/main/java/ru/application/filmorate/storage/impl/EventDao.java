@@ -28,7 +28,7 @@ public class EventDao implements EventStorage {
                 event.getTimestamp(),
                 event.getUserId(),
                 event.getEventType().toString(),
-                event.getOperationType().toString(),
+                event.getOperation().toString(),
                 event.getEntityId()
         );
     }
