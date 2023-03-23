@@ -72,7 +72,7 @@ public class Mapper {
                 .timestamp(rs.getTimestamp("time_stamp"))
                 .userId(rs.getInt("user_id"))
                 .eventType(EventType.valueOf(rs.getString("event_type")))
-                .operationType(OperationType.valueOf(rs.getString("event_operation")))
+                .operation(OperationType.valueOf(rs.getString("event_operation")))
                 .entityId(rs.getInt("entity_id"))
                 .build();
     }
