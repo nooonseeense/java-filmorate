@@ -2,7 +2,7 @@ package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.storage.DirectorStorage;
 
@@ -30,7 +30,7 @@ public class DirectorService {
      */
     public Director get(int id) {
         return directorStorage.get(id)
-                .orElseThrow(() -> new ObjectWasNotFoundException("Режиссер с id =" + id + " не найден."));
+                .orElseThrow(() -> new ObjectDoesNotExist("Режиссер с id =" + id + " не найден."));
     }
 
     /**
@@ -41,7 +41,7 @@ public class DirectorService {
      */
     public Director create(Director director) {
         return directorStorage.create(director)
-                .orElseThrow(() -> new ObjectWasNotFoundException("Произошла ошибка при создании режиссера."));
+                .orElseThrow(() -> new ObjectDoesNotExist("Произошла ошибка при создании режиссера."));
     }
 
     /**

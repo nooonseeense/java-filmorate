@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.application.filmorate.exception.ObjectWasNotFoundException;
+import ru.application.filmorate.exception.ObjectDoesNotExist;
 import ru.application.filmorate.model.Director;
 import ru.application.filmorate.model.Film;
 import ru.application.filmorate.model.Genre;
@@ -75,10 +75,8 @@ public class FilmDao implements FilmStorage {
             sql.append("WHERE LOWER(f.NAME) LIKE LOWER('%").append(query).append("%') OR ");
             sql.append("LOWER(d.NAME) LIKE LOWER('%").append(query).append("%') ");
         }
-        sql.append("GROUP BY f.ID, lf.FILM_ID IN ( " +
-                "SELECT FILM_ID " +
-                "FROM LIKE_FILM) " +
-                "ORDER BY COUNT(lf.film_id) DESC");
+        sql.append("GROUP BY f.ID, lf.FILM_ID " +
+                   "ORDER BY COUNT(lf.film_id) DESC");
         return jdbcTemplate.query(sql.toString(), Mapper::filmMapper);
     }
 
@@ -222,7 +220,7 @@ public class FilmDao implements FilmStorage {
         if (newRows == 0) {
             String message = String.format("Фильм с ID = %d не найден.", film.getId());
             log.debug("update(Film film): Фильм с ID = {} не найден.", film.getId());
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
         set(film);
         return film;
@@ -283,7 +281,7 @@ public class FilmDao implements FilmStorage {
         if (jdbcTemplate.update("DELETE FROM FILM WHERE ID = ? ", id) == 0) {
             String message = String.format("Фильм с id = %d не найден.", id);
             log.debug("update(Film film): Фильм с ID = {} не найден.", id);
-            throw new ObjectWasNotFoundException(message);
+            throw new ObjectDoesNotExist(message);
         }
     }
 
