@@ -1,6 +1,7 @@
 package ru.application.filmorate.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.application.filmorate.model.Event;
 import ru.application.filmorate.storage.EventStorage;
@@ -13,10 +14,10 @@ import java.time.Instant;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_ = {@Lazy})
 public class EventService {
     private final EventStorage eventStorage;
-    private final UserStorage userStorage;
+    private final UserService userService;
 
     /**
      * Метод получения списка событий по ID пользователя
@@ -25,7 +26,7 @@ public class EventService {
      * @return Список событий
      */
     public List<Event> get(int userId) {
-        userStorage.get(userId);
+        userService.exists(userId);
         return eventStorage.get(userId);
     }
 

@@ -60,7 +60,7 @@ public class UserService {
      * @return список друзей пользователя
      */
     public List<User> getListOfFriends(Integer id) {
-        userStorage.get(id);
+        exists(id);
         return friendStorage.getListOfFriends(id);
     }
 
