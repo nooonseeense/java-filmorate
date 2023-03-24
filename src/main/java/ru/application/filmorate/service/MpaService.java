@@ -2,7 +2,7 @@ package ru.application.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.application.filmorate.dao.MpaDao;
+import ru.application.filmorate.storage.impl.MpaDao;
 import ru.application.filmorate.model.Mpa;
 
 import java.util.List;
@@ -12,11 +12,22 @@ import java.util.List;
 public class MpaService {
     private final MpaDao mpaDao;
 
+    /**
+     * Метод получения списка всех MPA
+     *
+     * @return Список всех MPA
+     */
     public List<Mpa> get() {
         return mpaDao.get();
     }
 
-    public Mpa getById(int id) {
-        return mpaDao.getById(id);
+    /**
+     * Метод получения MPA по ID
+     *
+     * @param id id MPA
+     * @return Объект MPA
+     */
+    public Mpa get(int id) {
+        return mpaDao.get(id);
     }
 }

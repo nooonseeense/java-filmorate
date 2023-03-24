@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class FilmDbStorageDaoTest {
+public class FilmDaoTest {
 
     private final FilmController filmController;
 
@@ -35,7 +35,7 @@ public class FilmDbStorageDaoTest {
                 .mpa(new Mpa(1, "G"))
                 .build();
 
-        Film filmInDb = filmController.getById(filmExpected.getId());
+        Film filmInDb = filmController.get(filmExpected.getId());
 
         assertEquals(filmExpected.getId(), filmInDb.getId());
         assertEquals(filmExpected.getName(), filmInDb.getName());
@@ -127,7 +127,7 @@ public class FilmDbStorageDaoTest {
 
 
         filmController.update(filmExpected);
-        Film actualFilm = filmController.getById(filmExpected.getId());
+        Film actualFilm = filmController.get(filmExpected.getId());
 
         assertEquals(filmExpected.getId(), actualFilm.getId());
         assertEquals(filmExpected.getName(), actualFilm.getName());
@@ -139,7 +139,7 @@ public class FilmDbStorageDaoTest {
     @Test
     @Sql(scripts = "file:src/test/resources/schema-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "file:src/test/resources/data-tst.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void shouldReturnPopularMoviesByLikes() {
+    public void shouldReturnPopularMovies() {
         Film filmExpected = Film.builder()
                 .id(1)
                 .name("Film1")
@@ -149,7 +149,7 @@ public class FilmDbStorageDaoTest {
                 .mpa(new Mpa(1, "G"))
                 .build();
 
-        Film actualFilm = filmController.getPopularMoviesByLikes(1).get(0);
+        Film actualFilm = filmController.getPopularMovies(1,null,null).get(0);
 
         assertEquals(filmExpected.getId(), actualFilm.getId());
         assertEquals(filmExpected.getName(), actualFilm.getName());
