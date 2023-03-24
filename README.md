@@ -1,2 +1,2 @@
-Кинорейтинг
+Filmorate
 ![schema.png](schema.png)
